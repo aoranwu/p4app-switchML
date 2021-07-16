@@ -112,10 +112,10 @@ control Processor(
             (   _, 32w0, packet_type_t.CONSUME3) : sum_read1_action();
             // If bitmap_before is nonzero, map_result is nonzero, and type is CONSUME0,
             // this is a retransmission, so just read first value
-            (   _,    _, packet_type_t.CONSUME0) : read0_action();
-            (   _,    _, packet_type_t.CONSUME1) : read0_action();
-            (   _,    _, packet_type_t.CONSUME2) : read0_action();
-            (   _,    _, packet_type_t.CONSUME3) : read0_action();
+            (   _,    _, packet_type_t.CONSUME0) : read1_action();
+            (   _,    _, packet_type_t.CONSUME1) : read1_action();
+            (   _,    _, packet_type_t.CONSUME2) : read1_action();
+            (   _,    _, packet_type_t.CONSUME3) : read1_action();
             // If type is HARVEST, read one set of values based on sequence
             (   _,    _, packet_type_t.HARVEST0) : read1_action(); // extract data1 slice in pipe 3
             (   _,    _, packet_type_t.HARVEST1) : read0_action(); // extract data0 slice in pipe 3

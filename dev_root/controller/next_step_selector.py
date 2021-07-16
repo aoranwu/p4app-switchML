@@ -61,7 +61,9 @@ class NextStepSelector(Control):
         ''' Add default entries '''
 
         # Special recirculation ports used for harvest passes
-        port = {1: 452, 2: 324, 3: 448, 4: 196, 5: 192, 6: 68, 7: 64}
+        # port = {1: 452, 2: 324, 3: 448, 4: 196, 5: 192, 6: 68, 7: 64}
+        # change port[7] to 68 for model use
+        port = {1: 452, 2: 324, 3: 448, 4: 196, 5: 192, 6: 68, 7: 68}
 
         # yapf: disable
         entries = [

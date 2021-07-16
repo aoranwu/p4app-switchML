@@ -15,6 +15,7 @@
 import inspect
 import logging
 import readline
+import traceback
 
 from cmd import Cmd
 from colors import color  #ansicolors
@@ -495,6 +496,25 @@ class Cli(Cmd, object):
             will be shown.
         '''
         self._show_workers(self.ctrl.udp_sender, self.ctrl.udp_receiver, line)
+
+    def do_worker_add_udp(self,line):
+        ''' Add udp worker in CLI
+            For testing purpose only
+            Add a UDP SwitchML worker. 
+            Usage: worker_add_udp <worker rank> <total number of workers> <MAC address> <IP address> [<UDP port>]
+        '''
+        try:
+            result = line.split()
+
+            rank = int(result[0], 0)
+            count = int(result[1], 0)
+            mac = result[2]
+            ip = result[3]
+            self.ctrl.add_udp_worker(0, rank, count, mac, ip)
+        except Exception as e:
+            print("Error: {}".format(traceback.format_exc()))
+            print("Usage:\n   {}".format(self.do_worker_add_udp.__doc__))
+            return
 
     def do_show_bitmap(self, line):
         ''' Show the current bitmap values per slot index. The default is

@@ -46,6 +46,8 @@ from grpc_server import GRPCServer
 from cli import Cli
 from common import front_panel_regex, mac_address_regex, validate_ip
 
+# change to False when running on real hardwaresho
+run_on_model = True
 
 class SwitchML(object):
     '''SwitchML controller'''
@@ -98,8 +100,8 @@ class SwitchML(object):
         try:
             interface = gc.ClientInterface('{}:{}'.format(bfrt_ip, bfrt_port),
                                            client_id=0,
-                                           device_id=self.dev,
-                                           is_master=True)
+                                           device_id=self.dev)
+                                           #is_master=True)
         except RuntimeError as re:
             msg = re.args[0] % re.args[1]
             self.critical_error(msg)
@@ -136,20 +138,20 @@ class SwitchML(object):
 
             # Enable loopback on PktGen ports
             pktgen_ports = [192, 448]
+            if not run_on_model:
+                print('\nYou must \'remove\' the ports in the BF ucli:\n')
+                for p in pktgen_ports:
+                    print('    bf-sde> dvm rmv_port 0 {}'.format(p))
+                input('\nPress Enter to continue...')
 
-            print('\nYou must \'remove\' the ports in the BF ucli:\n')
-            for p in pktgen_ports:
-                print('    bf-sde> dvm rmv_port 0 {}'.format(p))
-            input('\nPress Enter to continue...')
+                if not self.ports.set_loopback_mode_pktgen(pktgen_ports):
+                    self.critical_error(
+                        'Failed setting front panel ports in loopback mode')
 
-            if not self.ports.set_loopback_mode_pktgen(pktgen_ports):
-                self.critical_error(
-                    'Failed setting front panel ports in loopback mode')
-
-            print('\nAdd the ports again:\n')
-            for p in pktgen_ports:
-                print('    bf-sde> dvm add_port 0 {} 100 0'.format(p))
-            input('\nPress Enter to continue...')
+                print('\nAdd the ports again:\n')
+                for p in pktgen_ports:
+                    print('    bf-sde> dvm add_port 0 {} 100 0'.format(p))
+                input('\nPress Enter to continue...')
 
             # Packet Replication Engine table
             self.pre = PRE(self.target, gc, self.bfrt_info, self.cpu_port)

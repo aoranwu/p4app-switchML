@@ -1,0 +1,18 @@
+12:17:30 - INFO - SwitchML controller
+12:17:30 - INFO - Subscribe attempt #1
+12:17:30 - INFO - Subscribe response received 0
+12:17:30 - INFO - Connected to BFRT server 127.0.0.1:50052
+12:17:30 - INFO - Binding with p4_name switchml
+12:17:30 - INFO - Binding with p4_name switchml successful!!
+12:17:30 - INFO - Received switchml on GetForwarding on client 0, device 0
+12:17:43 - INFO - 49 front panel ports set in loopback mode
+12:17:43 - INFO - CPU port: 320
+12:18:21 - INFO - Added port: 1/0 100G none disable
+12:18:21 - INFO - Added port: 2/0 100G none disable
+12:18:21 - INFO - Added port: 3/0 100G none disable
+12:18:21 - INFO - Added port: 4/0 100G none disable
+12:18:21 - INFO - gRPC server started
+12:18:28 - INFO - Added UDP worker 0:de:08:be:d7:01:47 198.19.200.50
+12:18:33 - INFO - Added UDP worker 1:62:68:1b:cb:18:05 198.19.200.49
+12:18:35 - INFO - gRPC server stopped
+12:18:35 - INFO - Stopping controller

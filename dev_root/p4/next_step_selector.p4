@@ -123,13 +123,30 @@ control NextStepSelector(
         // Destination address will be filled in egress pipe
 
         // Send to multicast group; egress will fill in destination IP and MAC address
-        ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid;
+        // ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid;
+        ig_tm_md.mcast_grp_a = 0x0;
         ig_tm_md.level1_exclusion_id = null_level1_exclusion_id; // don't exclude any nodes
         ig_md.switchml_md.packet_type = packet_type_t.BROADCAST;
         ig_tm_md.bypass_egress = 1w0;
         ig_dprsr_md.drop_ctl[0:0] = 0;
 
         count_broadcast = true;
+    }
+
+    action send_upward(){
+        hdr.d1.setInvalid();
+        ig_tm_md.ucast_egress_port = ig_md.switchml_md.upward_port;
+        ig_md.switchml_md.packet_type = packet_type_t.RETRANSMIT;
+        ig_tm_md.bypass_egress = 1w0;
+        ig_dprsr_md.drop_ctl[0:0] = 0;
+        // need to set dst addr
+        // 0xffff indicates upper level switch
+        ig_md.switchml_md.worker_id = 0xffff;
+    }
+
+    action distribute(){
+        ig_md.switchml_md.msg_type=msg_type_t.DIST;
+        broadcast();
     }
 
     action retransmit() {
@@ -158,6 +175,7 @@ control NextStepSelector(
             ig_md.switchml_md.packet_type : ternary;
             ig_md.switchml_md.first_last_flag : ternary; // 1: last 0: first
             ig_md.switchml_md.map_result : ternary;
+            ig_md.switchml_md.is_root_switch: ternary;
         }
         actions = {
             recirculate_for_CONSUME1;
@@ -174,6 +192,8 @@ control NextStepSelector(
             broadcast;
             retransmit;
             drop;
+            send_upward;
+            distribute;
         }
         const default_action = drop();
         size = 128;

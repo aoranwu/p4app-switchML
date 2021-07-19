@@ -40,6 +40,22 @@ enum bit<8> ip_protocol_t {
     UDP  = 17
 }
 
+// Switch type
+enum bit<8> switch_type_t{
+    ROOT = 0,
+    NONROOT = 1
+}
+
+// Msg type
+// aggre msg should be aggregated and then sent upward
+// dist msg should be sent downward
+// root switch converts aggre msg to dist msg after finish aggregating
+enum bit<4> msg_type_t{
+    AGGRE = 0,
+    DIST = 1
+}
+
+
 // ARP-specific types
 enum bit<16> arp_opcode_t {
     REQUEST = 1,
@@ -209,6 +225,16 @@ header switchml_md_h {
 
     // Number of workers
     num_workers_t num_workers;
+
+    
+    //root or non-root
+    bit<1> is_root_switch;
+
+    PortId_t upward_port;
+
+    bit<4> msg_type;
+    //unused
+    bit<2> unused;
 }
 
 // Bridged metadata header for RDMA

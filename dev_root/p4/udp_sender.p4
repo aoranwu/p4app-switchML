@@ -54,9 +54,9 @@ control UDPSender(
         hdr.udp.length = UDP_LENGTH;
 
         hdr.switchml.setValid();
-        hdr.switchml.msg_type = 1;
+        // hdr.switchml.msg_type = 1;
         hdr.switchml.unused = 0;
-        hdr.switchml.size = eg_md.switchml_md.packet_size;
+        // hdr.switchml.size = eg_md.switchml_md.packet_size;
         hdr.switchml.job_number = eg_md.switchml_md.job_number;
         hdr.switchml.tsi = eg_md.switchml_md.tsi;
 

@@ -23,6 +23,8 @@ from colors import color  #ansicolors
 from common import front_panel_regex, mac_address_regex, validate_ip
 
 
+
+
 class CommandError(Exception):
     ''' Command failed '''
     pass
@@ -515,6 +517,20 @@ class Cli(Cmd, object):
             print("Error: {}".format(traceback.format_exc()))
             print("Usage:\n   {}".format(self.do_worker_add_udp.__doc__))
             return
+
+    def do_set_switch_type(self, arg):
+        # set_switch_type <is_root_switch>
+        # set_switch_type 0: non-root
+        # set_switch_type 1: root
+        is_root_switch = int(arg.split()[0])
+        self.ctrl.set_switch_type.set_default_entry(is_root_switch)
+
+    def do_set_upper_switch(self, arg):
+        # set_upper_switch <upward_port> <upper_switch_mac> <upper_switch_ip>
+        upward_port = int(arg.split()[0])
+        self.ctrl.set_upward_port.set_default_entry(upward_port)
+        self.ctrl.udp_sender.add_udp_worker(0xffff,arg.split()[1],arg.split()[2])
+
 
     def do_show_bitmap(self, line):
         ''' Show the current bitmap values per slot index. The default is

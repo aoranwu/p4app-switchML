@@ -33,6 +33,9 @@
 #include "exponents.p4"
 #include "processor.p4"
 #include "next_step_selector.p4"
+// support for multi-switch
+#include "set_switch_type.p4"
+#include "set_upward_port.p4"
 
 control Ingress(
     inout header_t hdr,
@@ -55,6 +58,9 @@ control Ingress(
     WorkersCounter() workers_counter;
     ReconstructWorkerBitmap() reconstruct_worker_bitmap;
     UpdateAndCheckWorkerBitmap() update_and_check_worker_bitmap;
+
+    SetSwitchType() set_switch;
+    SetUpwardPort() set_upward_port;
 
     NextStepSelector() next_step_selector;
 
@@ -94,6 +100,46 @@ control Ingress(
     Processor() value31;
 
     apply {
+        // set switch type to be root or non-root
+        set_switch.apply(ig_md.switchml_md);
+        set_upward_port.apply(ig_md.switchml_md);
+        ig_md.switchml_md.msg_type = hdr.switchml.msg_type;
+
+
+        if(hdr.switchml.msg_type==msg_type_t.DIST){
+
+
+            // need to modify
+            ig_md.switchml_md.packet_size = hdr.switchml.size;
+            ig_md.switchml_md.dst_port = hdr.udp.src_port;
+            ig_md.switchml_md.src_port = hdr.udp.dst_port;
+            ig_md.switchml_md.pool_index = hdr.switchml.pool_index[13:0] ++ hdr.switchml.pool_index[15:15];
+            // Why d0 and d1 are invalid by default????
+            // hdr.d0.setValid();
+            // hdr.d1.setValid();
+            // Why set invalid??
+
+            hdr.ethernet.setInvalid();
+            hdr.ipv4.setInvalid();
+            hdr.udp.setInvalid();
+            hdr.switchml.setInvalid();
+
+
+
+            // set the switch as the source MAC address
+            hdr.ethernet.src_addr = hdr.ethernet.dst_addr;
+            // destination address will be filled in egress pipe
+
+            // send to multicast group; egress will fill in destination IP and MAC address
+            // hardcoded according to control plane code here
+            // ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid;
+            ig_tm_md.mcast_grp_a = 0x1234;
+            ig_tm_md.level1_exclusion_id = null_level1_exclusion_id; // don't exclude any nodes
+            ig_md.switchml_md.packet_type = packet_type_t.BROADCAST;
+            ig_tm_md.bypass_egress = 1w0;
+            ig_dprsr_md.drop_ctl[0:0] = 0;
+        }else{
+
         // If this is a SwitchML packet
         // get worker masks, pool base index, other parameters for this packet
         // add switchml_md header if it isn't already added
@@ -185,6 +231,7 @@ control Ingress(
             }
         }
     }
+    }
 }
 
 control Egress(
@@ -217,7 +264,9 @@ control Egress(
             if (eg_md.switchml_md.worker_type == worker_type_t.ROCEv2) {
                 rdma_sender.apply(hdr, eg_md, eg_intr_md, eg_intr_md_from_prsr, eg_intr_dprs_md);
             } else {
+                hdr.switchml.msg_type = eg_md.switchml_md.msg_type;
                 udp_sender.apply(eg_md, eg_intr_md, hdr);
+                hdr.switchml.size = eg_md.switchml_md.packet_size;
             }
         }
     }

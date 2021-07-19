@@ -147,7 +147,7 @@ control RDMAReceiver(
 
         // Record packet size for use in recirculation
         ig_md.switchml_md.packet_size = packet_size;
-        ig_md.switchml_md.recirc_port_selector = (queue_pair_index_t) QP_INDEX;
+        // ig_md.switchml_md.recirc_port_selector = (queue_pair_index_t) QP_INDEX;
 
         rdma_receive_counter.count();
     }

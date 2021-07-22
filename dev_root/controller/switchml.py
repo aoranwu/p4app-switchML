@@ -44,6 +44,7 @@ from rdma_sender import RDMASender
 from udp_sender import UDPSender
 from set_switch_type import SetSwitchType
 from set_upward_port import SetUpwardPort
+from get_port_from_worker_id import GetPortFromWorkerID
 from grpc_server import GRPCServer
 from cli import Cli
 from common import front_panel_regex, mac_address_regex, validate_ip
@@ -176,6 +177,8 @@ class SwitchML(object):
             # Workers counter
             self.workers_counter = WorkersCounter(self.target, gc,
                                                   self.bfrt_info)
+            # Worker id and port mapping
+            self.get_port_from_worker_id = GetPortFromWorkerID(gc, self.bfrt_info)
             # Exponents
             self.exponents = Exponents(self.target, gc, self.bfrt_info)
             # Processors
@@ -498,6 +501,9 @@ class SwitchML(object):
             return (False, error_msg)
 
         self.udp_sender.add_udp_worker(worker_id, worker_mac, worker_ip)
+
+        # add to worker_id egress port mapping
+        self.get_port_from_worker_id.set_port_for_worker_id(worker_id, dev_port)
 
         # Add multicast group if not present
         if session_id not in self.multicast_groups:

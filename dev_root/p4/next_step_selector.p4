@@ -152,6 +152,7 @@ control NextStepSelector(
     action retransmit() {
         hdr.d1.setInvalid();
 
+        ig_md.switchml_md.msg_type=msg_type_t.RETRANSMIT;
         // Send back out ingress port
         ig_tm_md.ucast_egress_port = ig_md.switchml_md.ingress_port;
         ig_md.switchml_md.packet_type = packet_type_t.RETRANSMIT;

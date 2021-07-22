@@ -130,7 +130,11 @@ class NextStepSelector(Control):
             ## (shouldn't ever get here, because the packet would be dropped in CONSUME)
             (               None, None, PacketType.HARVEST7, Flag.FIRST,    0, None, 24, 'drop', None),
             ## Retransmit any other HARVEST packets
-            (               None, None, PacketType.HARVEST7, Flag.FIRST, None, None, 25, 'retransmit', None),
+            # (               None, None, PacketType.HARVEST7, Flag.FIRST, None, None, 25, 'retransmit', None),
+            # For duplicates received from the worker, lower level switch send the packet upward to trigger transmission from upper level switch
+            (               None, None, PacketType.HARVEST7, Flag.FIRST, None, 0, 25, 'send_upward', None),
+            # When received retransmission packet from upper level switch, retransmit it to workers
+            (               None, None, PacketType.HARVEST7, Flag.FIRST, None, 1, 25, 'retransmit', None),
             ## Drop any other HARVEST packets
             (               None, None, PacketType.HARVEST7,       None, None, None, 26, 'drop', None)
         ])

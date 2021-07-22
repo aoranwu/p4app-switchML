@@ -186,6 +186,7 @@ parser IngressParser(
 
     state parse_switchml {
         pkt.extract(hdr.switchml);
+        ig_md.switchml_md.original_worker_id = hdr.switchml.original_worker_id;
         transition parse_values;
     }
 

@@ -109,6 +109,7 @@ control UDPSender(
         hdr.udp.setValid();
         hdr.switchml.setValid();
         hdr.switchml.pool_index = 16w0;
+        hdr.switchml.original_worker_id = eg_md.switchml_md.original_worker_id;
 
         switch_mac_and_ip.apply();
         dst_addr.apply();

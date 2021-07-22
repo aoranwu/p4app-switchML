@@ -36,6 +36,7 @@
 // support for multi-switch
 #include "set_switch_type.p4"
 #include "set_upward_port.p4"
+#include "get_port_from_worker_id.p4"
 
 control Ingress(
     inout header_t hdr,
@@ -61,6 +62,7 @@ control Ingress(
 
     SetSwitchType() set_switch;
     SetUpwardPort() set_upward_port;
+    GetPortFromWorkerID() get_port_from_worker_id;
 
     NextStepSelector() next_step_selector;
 
@@ -138,7 +140,39 @@ control Ingress(
             ig_md.switchml_md.packet_type = packet_type_t.BROADCAST;
             ig_tm_md.bypass_egress = 1w0;
             ig_dprsr_md.drop_ctl[0:0] = 0;
-        }else{
+        }else if(ig_md.switchml_md.msg_type==msg_type_t.RETRANSMIT){
+            ig_md.switchml_md.packet_size = hdr.switchml.size;
+            ig_md.switchml_md.dst_port = hdr.udp.src_port;
+            ig_md.switchml_md.src_port = hdr.udp.dst_port;
+            ig_md.switchml_md.pool_index = hdr.switchml.pool_index[13:0] ++ hdr.switchml.pool_index[15:15];
+            // Why d0 and d1 are invalid by default????
+            // hdr.d0.setValid();
+            // hdr.d1.setValid();
+            // Why set invalid??
+
+            hdr.ethernet.setInvalid();
+            hdr.ipv4.setInvalid();
+            hdr.udp.setInvalid();
+            hdr.switchml.setInvalid();
+
+
+
+            // set the switch as the source MAC address
+            hdr.ethernet.src_addr = hdr.ethernet.dst_addr;
+
+            // set up the egress port according to original worker id
+            // ig_tm_md.ucast_egress_port = ig_md.switchml_md.ingress_port;
+            ig_tm_md.ucast_egress_port = 1;
+            // set up the worker id
+            ig_md.switchml_md.worker_id = ig_md.switchml_md.original_worker_id;
+
+            get_port_from_worker_id.apply(ig_md,ig_tm_md);
+
+            ig_md.switchml_md.packet_type = packet_type_t.RETRANSMIT;
+            ig_tm_md.bypass_egress = 1w0;
+            ig_dprsr_md.drop_ctl[0:0] = 0;
+        }     
+        else{
 
         // If this is a SwitchML packet
         // get worker masks, pool base index, other parameters for this packet

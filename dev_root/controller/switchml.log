@@ -1,19 +1,18 @@
-13:21:12 - INFO - SwitchML controller
-13:21:12 - INFO - Subscribe attempt #1
-13:21:12 - INFO - Subscribe response received 0
-13:21:12 - INFO - Connected to BFRT server 127.0.0.1:50052
-13:21:12 - INFO - Binding with p4_name switchml
-13:21:12 - INFO - Binding with p4_name switchml successful!!
-13:21:12 - INFO - Received switchml on GetForwarding on client 0, device 0
-13:21:25 - INFO - 49 front panel ports set in loopback mode
-13:21:25 - INFO - CPU port: 320
-13:23:01 - INFO - Setting up set_switch_type table...
-13:23:01 - INFO - Setting up set_upward_port_tbl table...
-13:23:01 - INFO - Added port: 1/0 100G none disable
-13:23:01 - INFO - Added port: 1/1 100G none disable
-13:23:01 - INFO - Added port: 1/2 100G none disable
-13:23:02 - INFO - gRPC server started
-13:23:10 - INFO - Added UDP worker 0:e6:5d:09:2e:a3:ac 198.19.200.48
-13:23:10 - INFO - Added UDP worker 1:9e:3e:ed:c0:b6:5c 198.19.200.47
-13:23:12 - INFO - gRPC server stopped
-13:23:12 - INFO - Stopping controller
+15:59:01 - INFO - SwitchML controller
+15:59:01 - INFO - Subscribe attempt #1
+15:59:01 - INFO - Subscribe response received 0
+15:59:01 - INFO - Connected to BFRT server 127.0.0.1:50052
+15:59:01 - INFO - Binding with p4_name switchml
+15:59:01 - INFO - Binding with p4_name switchml successful!!
+15:59:02 - INFO - Received switchml on GetForwarding on client 0, device 0
+15:59:15 - INFO - 49 front panel ports set in loopback mode
+15:59:15 - INFO - CPU port: 320
+15:59:34 - INFO - Setting up get_port_from_worker_id table...
+16:00:52 - INFO - Setting up set_switch_type table...
+16:00:52 - INFO - Setting up set_upward_port_tbl table...
+16:00:53 - INFO - Added port: 1/0 100G none disable
+16:00:53 - INFO - Added port: 1/1 100G none disable
+16:00:53 - INFO - Added port: 1/2 100G16:01:29 - INFO - Added UDP worker 0:06:00:00:00:00:16:01:48 - INFO - Added UDP worker 0:e6:5d:09:2e:a3:ac 198.19.200.48
+16:01:48 - INFO - Added UDP worker 1:9e:3e:ed:c0:b6:5c 198.19.200.47
+16:01:50 - INFO - gRPC server stopped
+16:01:50 - INFO - Stopping controller

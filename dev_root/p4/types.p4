@@ -52,7 +52,8 @@ enum bit<8> switch_type_t{
 // root switch converts aggre msg to dist msg after finish aggregating
 enum bit<4> msg_type_t{
     AGGRE = 0,
-    DIST = 1
+    DIST = 1,
+    RETRANSMIT=2
 }
 
 
@@ -235,6 +236,9 @@ header switchml_md_h {
     bit<4> msg_type;
     //unused
     bit<2> unused;
+
+    // store the worker id for multi-switch retransmission
+    worker_id_t original_worker_id;
 }
 
 // Bridged metadata header for RDMA

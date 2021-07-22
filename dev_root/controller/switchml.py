@@ -563,7 +563,7 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='SwitchML controller.')
     argparser.add_argument('--program',
                            type=str,
-                           default='SwitchML',
+                           default='switchml',
                            help='P4 program name. Default: SwitchML')
     argparser.add_argument(
         '--bfrt-ip',

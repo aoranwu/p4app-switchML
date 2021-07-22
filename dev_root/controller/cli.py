@@ -519,11 +519,17 @@ class Cli(Cmd, object):
             return
 
     def do_set_switch_type(self, arg):
-        # set_switch_type <is_root_switch>
-        # set_switch_type 0: non-root
+        # set_switch_type <is_root_switch> [pipe_id]
+        # set_switch_type 0: non-root 
         # set_switch_type 1: root
-        is_root_switch = int(arg.split()[0])
-        self.ctrl.set_switch_type.set_default_entry(is_root_switch)
+        # if pipe_id is specified, set for that specific pipe
+        # else set for all pipes
+        args = arg.split()
+        is_root_switch = int(args[0])
+        pipe = -1
+        if len(args)==2:
+            pipe = int(args[1])
+        self.ctrl.set_switch_type.set_default_entry(is_root_switch,pipe)
 
     def do_set_upper_switch(self, arg):
         # set_upper_switch <upward_port> <upper_switch_mac> <upper_switch_ip>

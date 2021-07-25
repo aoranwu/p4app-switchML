@@ -27,11 +27,13 @@ class UDPSender(Control):
 
         self.tables = [
             bfrt_info.table_get('pipe.Egress.udp_sender.switch_mac_and_ip'),
-            bfrt_info.table_get('pipe.Egress.udp_sender.dst_addr')
+            bfrt_info.table_get('pipe.Egress.udp_sender.dst_addr'),
+            bfrt_info.table_get('pipe.Egress.udp_sender.set_dst_udp_port_tbl')
         ]
 
         self.switch_mac_and_ip = self.tables[0]
         self.dst_addr = self.tables[1]
+        self.set_dst_udp_port_tbl = self.tables[2]
 
         # Annotations
         self.switch_mac_and_ip.info.data_field_annotation_add(
@@ -104,6 +106,16 @@ class UDPSender(Control):
                 self.gc.DataTuple('ip_dst_addr', worker_ip)
             ], 'Egress.udp_sender.set_dst_addr')
         ])
+    
+    # Set udp port for a worker with worker_id
+    def set_udp_port_for_worker(self,worker_id,udp_port=0xbeef):
+        # self.logger.info("Set udp port to be {} for worker with id {}".format(udp_port,worker_id))
+        self.set_dst_udp_port_tbl.entry_add(
+            self.target,
+            [self.set_dst_udp_port_tbl.make_key([self.gc.KeyTuple('eg_md.switchml_md.worker_id',
+                                              worker_id)])],
+            [self.set_dst_udp_port_tbl.make_data([self.gc.DataTuple('dst_port', udp_port)],
+                                  'Egress.udp_sender.set_dst_udp_port')])
 
     def get_workers_counter(self, worker_id=None):
         ''' Get the current values of sent packets/bytes per UDP worker.

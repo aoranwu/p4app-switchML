@@ -456,7 +456,7 @@ class SwitchML(object):
         self.clear_multicast_group(session_id)
 
     def add_udp_worker(self, session_id, worker_id, num_workers, worker_mac,
-                       worker_ip):
+                       worker_ip, udp_port=0xbee0):
         ''' Add SwitchML UDP worker.
 
             Keyword arguments:
@@ -499,6 +499,8 @@ class SwitchML(object):
             return (False, error_msg)
 
         self.udp_sender.add_udp_worker(worker_id, worker_mac, worker_ip)
+                # set udp port for the worker
+        self.udp_sender.set_udp_port_for_worker(worker_id,udp_port)
 
         # add to worker_id egress port mapping
         self.get_port_from_worker_id.set_port_for_worker_id(worker_id, dev_port)

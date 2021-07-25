@@ -103,6 +103,22 @@ control UDPSender(
         counters = send_counter;
     }
 
+    action set_dst_udp_port(bit<16> dst_port){
+        // send back to source port for software PS implementation
+        hdr.udp.dst_port = dst_port;
+    }
+
+    table set_dst_udp_port_tbl{
+        key = {
+            eg_md.switchml_md.worker_id : exact;
+        }
+        actions = {
+            set_dst_udp_port;
+            NoAction;
+        }
+        default_action = NoAction;
+    }
+
     apply {
         hdr.ethernet.setValid();
         hdr.ipv4.setValid();
@@ -113,7 +129,8 @@ control UDPSender(
 
         switch_mac_and_ip.apply();
         dst_addr.apply();
-
+        set_dst_udp_port_tbl.apply();
+        
         // Add payload size
         if (eg_md.switchml_md.packet_size == packet_size_t.IBV_MTU_256) {
             hdr.ipv4.total_len = hdr.ipv4.total_len + 256;

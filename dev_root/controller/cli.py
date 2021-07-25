@@ -512,7 +512,11 @@ class Cli(Cmd, object):
             count = int(result[1], 0)
             mac = result[2]
             ip = result[3]
-            self.ctrl.add_udp_worker(0, rank, count, mac, ip)
+            if len(result)>4:
+                udp_port = int(result[4])
+                self.ctrl.add_udp_worker(0, rank, count, mac, ip, udp_port)
+            else:
+                self.ctrl.add_udp_worker(0, rank, count, mac, ip)
         except Exception as e:
             print("Error: {}".format(traceback.format_exc()))
             print("Usage:\n   {}".format(self.do_worker_add_udp.__doc__))
@@ -541,12 +545,17 @@ class Cli(Cmd, object):
     #     self.ctrl.set_upward_port.set_default_entry(upward_port)
     #     self.ctrl.udp_sender.add_udp_worker(0xffff,arg.split()[1],arg.split()[2])
     def do_set_non_root_switch(self, arg):
-        # set_non_root_switch <upward_port> <upper_switch_mac> <upper_switch_ip>
+        # set_non_root_switch <upward_port> <upper_switch_mac> <upper_switch_ip>  [switch_udp_port]
         # Need to provide upward port and upper switch mac/ip
         upward_port = int(arg.split()[0])
         # self.set_upward_port.set_default_entry(upward_port)
         self.ctrl.set_switch_type.set_default_entry(0,upward_port)
         self.ctrl.udp_sender.add_udp_worker(0xffff,arg.split()[1],arg.split()[2])
+        if len(arg.split())>=4:
+        # set udp port for the worker
+            self.ctrl.udp_sender.set_udp_port_for_worker(0xffff,int(arg.split()[3]))
+        else:
+            self.ctrl.udp_sender.set_udp_port_for_worker(0xffff,udp_port=0xbeef)
 
 
     def do_show_bitmap(self, line):

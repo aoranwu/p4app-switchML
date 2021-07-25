@@ -518,23 +518,34 @@ class Cli(Cmd, object):
             print("Usage:\n   {}".format(self.do_worker_add_udp.__doc__))
             return
 
-    def do_set_switch_type(self, arg):
-        # set_switch_type <is_root_switch> [pipe_id]
-        # set_switch_type 0: non-root 
-        # set_switch_type 1: root
-        # if pipe_id is specified, set for that specific pipe
-        # else set for all pipes
-        args = arg.split()
-        is_root_switch = int(args[0])
-        pipe = -1
-        if len(args)==2:
-            pipe = int(args[1])
-        self.ctrl.set_switch_type.set_default_entry(is_root_switch,pipe)
+    # def do_set_switch_type(self, arg):
+    #     # set_switch_type <is_root_switch> [pipe_id]
+    #     # set_switch_type 0: non-root 
+    #     # set_switch_type 1: root
+    #     # if pipe_id is specified, set for that specific pipe
+    #     # else set for all pipes
+    #     args = arg.split()
+    #     is_root_switch = int(args[0])
+    #     pipe = -1
+    #     if len(args)==2:
+    #         pipe = int(args[1])
+    #     self.ctrl.set_switch_type.set_default_entry(is_root_switch,pipe)
 
-    def do_set_upper_switch(self, arg):
-        # set_upper_switch <upward_port> <upper_switch_mac> <upper_switch_ip>
+    def do_set_root_switch(self, arg):
+        # set_root_switch
+        self.ctrl.set_switch_type.set_default_entry(1)
+
+    # def do_set_upper_switch(self, arg):
+    #     # set_upper_switch <upward_port> <upper_switch_mac> <upper_switch_ip>
+    #     upward_port = int(arg.split()[0])
+    #     self.ctrl.set_upward_port.set_default_entry(upward_port)
+    #     self.ctrl.udp_sender.add_udp_worker(0xffff,arg.split()[1],arg.split()[2])
+    def do_set_non_root_switch(self, arg):
+        # set_non_root_switch <upward_port> <upper_switch_mac> <upper_switch_ip>
+        # Need to provide upward port and upper switch mac/ip
         upward_port = int(arg.split()[0])
-        self.ctrl.set_upward_port.set_default_entry(upward_port)
+        # self.set_upward_port.set_default_entry(upward_port)
+        self.ctrl.set_switch_type.set_default_entry(0,upward_port)
         self.ctrl.udp_sender.add_udp_worker(0xffff,arg.split()[1],arg.split()[2])
 
 

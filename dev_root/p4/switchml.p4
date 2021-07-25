@@ -104,7 +104,7 @@ control Ingress(
     apply {
         // set switch type to be root or non-root
         set_switch.apply(ig_md.switchml_md);
-        set_upward_port.apply(ig_md.switchml_md);
+        // set_upward_port.apply(ig_md.switchml_md);
         ig_md.switchml_md.msg_type = hdr.switchml.msg_type;
 
 

@@ -43,7 +43,6 @@ from next_step_selector import NextStepSelector
 from rdma_sender import RDMASender
 from udp_sender import UDPSender
 from set_switch_type import SetSwitchType
-from set_upward_port import SetUpwardPort
 from get_port_from_worker_id import GetPortFromWorkerID
 from grpc_server import GRPCServer
 from cli import Cli
@@ -195,7 +194,6 @@ class SwitchML(object):
             self.udp_sender = UDPSender(self.target, gc, self.bfrt_info)
 
             self.set_switch_type = SetSwitchType(gc, self.bfrt_info)
-            self.set_upward_port = SetUpwardPort(gc, self.bfrt_info)
 
             # Add multicast group for flood
             self.pre.add_multicast_group(self.all_ports_mgid)

@@ -21,40 +21,44 @@ class SetSwitchType(Table):
         # set the switch to be non-root by default
         self.set_default_entry(False)
 
-    def set_default_entry(self, is_root_switch, pipe=-1):
-        self.clear(pipe)
-        if pipe==-1:
-            if isinstance(self.target,List):
-                self.target = gc.Target(device_id=0,pipe_id=0xffff)
-            if is_root_switch:
-                self.set_switch_type.default_entry_set(
-                    self.target,
-                    self.set_switch_type.make_data([],'Ingress.set_switch.set_root')
-                )
-            else:
-                self.set_switch_type.default_entry_set(
-                    self.target,
-                    self.set_switch_type.make_data([],'Ingress.set_switch.set_non_root')
-                )
-        else:
-            # TODO: test if device has 4 pipes, and parameter pipe is valid
-            target = gc.Target(device_id=0,pipe_id=0xffff)
-            self.set_switch_type.attribute_entry_scope_set(target, predefined_pipe_scope=True,
-                                                            predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
-            self.target = []
-            for i in range(4):
-                self.target.append(gc.Target(device_id=0,pipe_id=i))
+    def set_default_entry(self, is_root_switch,upward_port=0, pipe=-1):
+        self.clear()
+        self.set_switch_type.default_entry_set(
+                self.target,
+                self.set_switch_type.make_data([gc.DataTuple('is_root',is_root_switch),gc.DataTuple('upward_port',upward_port)],'Ingress.set_switch.set_root')
+            )
+        # if pipe==-1:
+        #     if isinstance(self.target,List):
+        #         self.target = gc.Target(device_id=0,pipe_id=0xffff)
+        #     if is_root_switch:
+        #         self.set_switch_type.default_entry_set(
+        #             self.target,
+        #             self.set_switch_type.make_data([],'Ingress.set_switch.set_root')
+        #         )
+        #     else:
+        #         self.set_switch_type.default_entry_set(
+        #             self.target,
+        #             self.set_switch_type.make_data([],'Ingress.set_switch.set_non_root')
+        #         )
+        # else:
+        #     # TODO: test if device has 4 pipes, and parameter pipe is valid
+        #     target = gc.Target(device_id=0,pipe_id=0xffff)
+        #     self.set_switch_type.attribute_entry_scope_set(target, predefined_pipe_scope=True,
+        #                                                     predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
+        #     self.target = []
+        #     for i in range(4):
+        #         self.target.append(gc.Target(device_id=0,pipe_id=i))
 
-            if is_root_switch:
-                self.set_switch_type.default_entry_set(
-                    self.target[pipe],
-                    self.set_switch_type.make_data([],'Ingress.set_switch.set_root')
-                )
-            else:
-                self.set_switch_type.default_entry_set(
-                    self.target[pipe],
-                    self.set_switch_type.make_data([],'Ingress.set_switch.set_non_root')
-                )
+        #     if is_root_switch:
+        #         self.set_switch_type.default_entry_set(
+        #             self.target[pipe],
+        #             self.set_switch_type.make_data([],'Ingress.set_switch.set_root')
+        #         )
+        #     else:
+        #         self.set_switch_type.default_entry_set(
+        #             self.target[pipe],
+        #             self.set_switch_type.make_data([],'Ingress.set_switch.set_non_root')
+        #         )
 
 
     def clear(self,pipe=-1):

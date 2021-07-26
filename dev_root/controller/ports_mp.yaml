@@ -2,10 +2,10 @@ ports:
     # 1/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "06:00:00:00:00:01"}
     1/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "de:08:be:d7:01:47"}
     2/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "62:68:1b:cb:18:05"}
-    33/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "86:bd:7b:5c:b9:2b"}
-    34/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "7e:0a:ae:fb:53:df"}
+    17/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "86:bd:7b:5c:b9:2b"}
+    18/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "7e:0a:ae:fb:53:df"}
     # 65/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "96:ef:d0:a3:8d:c3"}
     # 66/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "e2:61:b9:01:81:37"}
-    65/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "06:00:00:00:00:02"}
-    66/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "06:00:00:00:00:03"}
+    33/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "06:00:00:00:00:02"}
+    34/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "06:00:00:00:00:03"}
     # 4/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "7e:0a:ae:fb:53:df"}

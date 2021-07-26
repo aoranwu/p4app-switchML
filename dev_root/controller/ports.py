@@ -65,6 +65,7 @@ class Ports(object):
 
         try:
             dev_port = next(resp)[0].to_dict()['$DEV_PORT']
+            print("Port {}/{}:{}".format(fp_port, lane, dev_port))
         except BfruntimeRpcException:
             return (False, 'Port {}/{} not found!'.format(fp_port, lane))
         else:

@@ -583,26 +583,26 @@ class SwitchML(object):
         self.get_port_from_worker_id.set_port_for_worker_id_for_pipe(worker_id, dev_port, pipe)
 
         # Add multicast group if not present
-        if session_id not in self.multicast_groups:
-            self.pre.add_multicast_group(session_id)
-            self.multicast_groups[session_id] = {}
+        if 1000*pipe+session_id not in self.multicast_groups:
+            self.pre.add_multicast_group_for_pipe(session_id, pipe)
+            self.multicast_groups[1000*pipe+session_id] = {}
 
         if worker_id in self.multicast_groups[
-                session_id] and self.multicast_groups[session_id][
+                1000*pipe+session_id] and self.multicast_groups[1000*pipe+session_id][
                     worker_id] != dev_port:
             # Existing node with different port, remove it
-            self.pre.remove_multicast_node(worker_id)
-            del self.multicast_groups[session_id][worker_id]
+            self.pre.remove_multicast_node_for_pipe(worker_id,pipe)
+            del self.multicast_groups[1000*pipe+session_id][worker_id]
 
         # Add multicast node if not present
-        if worker_id not in self.multicast_groups[session_id]:
+        if worker_id not in self.multicast_groups[1000*pipe+session_id]:
             # Add new node
-            success, error_msg = self.pre.add_multicast_node(
-                session_id, worker_id, dev_port)
+            success, error_msg = self.pre.add_multicast_node_for_pipe(
+                session_id, worker_id, dev_port, pipe)
             if not success:
                 return (False, error_msg)
 
-            self.multicast_groups[session_id][worker_id] = dev_port
+            self.multicast_groups[1000*pipe + session_id][worker_id] = dev_port
 
         self.log.info('Added UDP worker {}:{} {}'.format(
             worker_id, worker_mac, worker_ip))

@@ -19,8 +19,21 @@ class GetPortFromWorkerID(Table):
         self.clear()
 
     def set_port_for_worker_id(self, worker_id, port):
+        
         self.get_port_from_worker_id.entry_add(
             self.target,
+            [self.get_port_from_worker_id.make_key([gc.KeyTuple('ig_md.switchml_md.original_worker_id',
+                                                                    worker_id)])],
+            [self.get_port_from_worker_id.make_data([gc.DataTuple('port',port)],
+                                                        'Ingress.get_port_from_worker_id.set_egress_port')]
+
+        )
+
+    def set_port_for_worker_id_for_pipe(self, worker_id, port, pipe):
+        self.get_port_from_worker_id.attribute_entry_scope_set(self.target, predefined_pipe_scope=True,
+                                                            predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
+        self.get_port_from_worker_id.entry_add(
+            self.targets[pipe],
             [self.get_port_from_worker_id.make_key([gc.KeyTuple('ig_md.switchml_md.original_worker_id',
                                                                     worker_id)])],
             [self.get_port_from_worker_id.make_data([gc.DataTuple('port',port)],

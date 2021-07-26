@@ -569,18 +569,18 @@ class SwitchML(object):
         session_id = session_id % 0x8000
 
         # Add UDP receiver/sender entries
-        success, error_msg = self.udp_receiver.add_udp_worker(
+        success, error_msg = self.udp_receiver.add_udp_worker_for_pipe(
             worker_id, worker_mac, worker_ip, self.udp_port, self.udp_mask,
-            num_workers, session_id)
+            num_workers, session_id, pipe)
         if not success:
             return (False, error_msg)
 
-        self.udp_sender.add_udp_worker(worker_id, worker_mac, worker_ip)
-                # set udp port for the worker
-        self.udp_sender.set_udp_port_for_worker(worker_id,udp_port)
+        self.udp_sender.add_udp_worker_for_pipe(worker_id, worker_mac, worker_ip, pipe)
+        # set udp port for the worker
+        self.udp_sender.set_udp_port_for_worker_for_pipe(worker_id,udp_port,pipe)
 
         # add to worker_id egress port mapping
-        self.get_port_from_worker_id.set_port_for_worker_id(worker_id, dev_port)
+        self.get_port_from_worker_id.set_port_for_worker_id_for_pipe(worker_id, dev_port, pipe)
 
         # Add multicast group if not present
         if session_id not in self.multicast_groups:

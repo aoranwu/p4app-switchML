@@ -14,6 +14,7 @@
 
 import logging
 
+import bfrt_grpc.bfruntime_pb2 as bfruntime_pb2
 from control import Control
 from common import WorkerType
 
@@ -117,6 +118,84 @@ class UDPReceiver(Control):
 
         self.table.entry_add(
             self.target,
+            [
+                self.table.make_key([
+                    self.gc.KeyTuple('$MATCH_PRIORITY', match_priority),
+                    # Don't match on ingress port; accept packets from a particular
+                    # worker no matter which port it comes in on.
+                    self.gc.KeyTuple(
+                        'ig_intr_md.ingress_port',
+                        0x000,  # 9 bits
+                        0x000),
+                    # Match on Ethernet addrs, IPs and port
+                    self.gc.KeyTuple('hdr.ethernet.src_addr', worker_mac,
+                                     worker_mac_mask),
+                    self.gc.KeyTuple('hdr.ethernet.dst_addr', self.switch_mac,
+                                     'FF:FF:FF:FF:FF:FF'),
+                    self.gc.KeyTuple('hdr.ipv4.src_addr', worker_ip,
+                                     worker_ip_mask),
+                    self.gc.KeyTuple('hdr.ipv4.dst_addr', self.switch_ip,
+                                     '255.255.255.255'),
+                    self.gc.KeyTuple('hdr.udp.dst_port', udp_port, udp_mask),
+                    # Ignore parser errors
+                    self.gc.KeyTuple('ig_prsr_md.parser_err', 0x0000, 0x0000)
+                ])
+            ],
+            [
+                self.table.make_data([
+                    self.gc.DataTuple('mgid', session_mgid),
+                    self.gc.DataTuple('worker_type', WorkerType.SWITCHML_UDP),
+                    self.gc.DataTuple('worker_id', worker_id),
+                    self.gc.DataTuple('num_workers', num_workers),
+                    self.gc.DataTuple('worker_bitmap', worker_mask)
+                ], 'Ingress.udp_receiver.set_bitmap')
+            ])
+        return (True, None)
+
+
+    def add_udp_worker_for_pipe(self, worker_id, worker_mac, worker_ip, udp_port,
+                       udp_mask, num_workers, session_mgid, pipe):
+        ''' Add SwitchML UDP entry.
+            One of the worker_mac and worker_ip arguments can be None,
+            but not both.
+
+            Keyword arguments:
+                udp_port -- base UDP port for this session
+                udp_mask -- mask for UDP port for this session
+                worker_id -- worker rank
+                worker_mac -- worker MAC address
+                worker_ip -- worker IP address
+                num_workers -- number of workers in this session
+                session_mgid -- multicast group ID for this session
+
+            Returns:
+                (success flag, None or error message)
+        '''
+        if worker_mac == None and worker_ip == None:
+            error_msg = 'Missing worker identifier for worker rank {}'.format(
+                worker_id)
+            self.log.error(error_msg)
+            return (False, error_msg)
+
+        if self.switch_mac == None or self.switch_ip == None:
+            error_msg = 'No switch address'
+            self.log.error(error_msg)
+            return (False, error_msg)
+
+        worker_mask = 1 << worker_id
+        worker_ip_mask = '255.255.255.255'
+        worker_mac_mask = 'FF:FF:FF:FF:FF:FF'
+        match_priority = 10
+
+        if worker_ip == None:
+            worker_ip = worker_ip_mask = '0.0.0.0'
+        if worker_mac == None:
+            worker_mac = worker_mac_mask = '00:00:00:00:00:00'
+
+        self.table.attribute_entry_scope_set(self.target, predefined_pipe_scope=True,
+                                                            predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
+        self.table.entry_add(
+            self.targets[pipe],
             [
                 self.table.make_key([
                     self.gc.KeyTuple('$MATCH_PRIORITY', match_priority),

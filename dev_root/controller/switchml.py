@@ -532,6 +532,83 @@ class SwitchML(object):
 
         return (True, None)
 
+    def add_udp_worker_for_pipe(self, session_id, worker_id, num_workers, worker_mac,
+                       worker_ip, udp_port, pipe):
+        ''' Add SwitchML UDP worker.
+
+            Keyword arguments:
+                session_id -- ID of the session
+                worker_id -- worker rank
+                num_workers -- number of workers in this session
+                worker_mac -- worker MAC address
+                worker_ip -- worker IP address
+
+            Returns:
+                (success flag, None or error message)
+        '''
+        #TODO session packet size
+        if worker_id >= 32:
+            error_msg = 'Worker ID {} too large; only 32 workers supported'.format(
+                worker_id)
+            self.log.error(error_msg)
+            return (False, error_msg)
+
+        if num_workers > 32:
+            error_msg = 'Worker count {} too large; only 32 workers supported'.format(
+                num_workers)
+            self.log.error(error_msg)
+            return (False, error_msg)
+
+        # Get port for node
+        success, dev_port = self.forwarder.get_dev_port(worker_mac)
+        if not success:
+            return (False, dev_port)
+
+        # Multicast groups below 0x8000 are used for sessions
+        # (the mgid is the session id)
+        session_id = session_id % 0x8000
+
+        # Add UDP receiver/sender entries
+        success, error_msg = self.udp_receiver.add_udp_worker(
+            worker_id, worker_mac, worker_ip, self.udp_port, self.udp_mask,
+            num_workers, session_id)
+        if not success:
+            return (False, error_msg)
+
+        self.udp_sender.add_udp_worker(worker_id, worker_mac, worker_ip)
+                # set udp port for the worker
+        self.udp_sender.set_udp_port_for_worker(worker_id,udp_port)
+
+        # add to worker_id egress port mapping
+        self.get_port_from_worker_id.set_port_for_worker_id(worker_id, dev_port)
+
+        # Add multicast group if not present
+        if session_id not in self.multicast_groups:
+            self.pre.add_multicast_group(session_id)
+            self.multicast_groups[session_id] = {}
+
+        if worker_id in self.multicast_groups[
+                session_id] and self.multicast_groups[session_id][
+                    worker_id] != dev_port:
+            # Existing node with different port, remove it
+            self.pre.remove_multicast_node(worker_id)
+            del self.multicast_groups[session_id][worker_id]
+
+        # Add multicast node if not present
+        if worker_id not in self.multicast_groups[session_id]:
+            # Add new node
+            success, error_msg = self.pre.add_multicast_node(
+                session_id, worker_id, dev_port)
+            if not success:
+                return (False, error_msg)
+
+            self.multicast_groups[session_id][worker_id] = dev_port
+
+        self.log.info('Added UDP worker {}:{} {}'.format(
+            worker_id, worker_mac, worker_ip))
+
+        return (True, None)
+
     def run(self):
         try:
             # Start listening for RPCs

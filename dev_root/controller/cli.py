@@ -522,6 +522,29 @@ class Cli(Cmd, object):
             print("Usage:\n   {}".format(self.do_worker_add_udp.__doc__))
             return
 
+    def do_worker_add_udp_for_pipe(self,line):
+        ''' Add udp worker in CLI
+            For testing purpose only
+            Add a UDP SwitchML worker. 
+            Usage: worker_add_udp <worker rank> <total number of workers> <MAC address> <IP address> <UDP port> <pipe num>
+        '''
+        try:
+            result = line.split()
+            pipe_num = int(result[-1])
+            rank = int(result[0], 0)
+            count = int(result[1], 0)
+            mac = result[2]
+            ip = result[3]
+            
+            udp_port = int(result[4])
+            self.ctrl.add_udp_worker_for_pipe(0, rank, count, mac, ip, udp_port, pipe_num)
+            
+                
+        except Exception as e:
+            print("Error: {}".format(traceback.format_exc()))
+            print("Usage:\n   {}".format(self.do_worker_add_udp.__doc__))
+            return
+
     # def do_set_switch_type(self, arg):
     #     # set_switch_type <is_root_switch> [pipe_id]
     #     # set_switch_type 0: non-root 
@@ -535,9 +558,14 @@ class Cli(Cmd, object):
     #         pipe = int(args[1])
     #     self.ctrl.set_switch_type.set_default_entry(is_root_switch,pipe)
 
-    def do_set_root_switch(self, arg):
+    def do_set_root_switch(self, line):
         # set_root_switch
         self.ctrl.set_switch_type.set_default_entry(1)
+    
+    def do_set_root_switch_for_pipe(self, line):
+        # set_root_switch pipe
+        pipe = int(line)
+        self.ctrl.set_switch_type.set_default_entry_for_pipe(1,pipe=pipe)
 
     # def do_set_upper_switch(self, arg):
     #     # set_upper_switch <upward_port> <upper_switch_mac> <upper_switch_ip>
@@ -557,6 +585,18 @@ class Cli(Cmd, object):
         else:
             self.ctrl.udp_sender.set_udp_port_for_worker(0xffff,udp_port=0xbeef)
 
+    def do_set_non_root_switch_for_pipe(self, arg):
+        # set_non_root_switch <upward_port> <upper_switch_mac> <upper_switch_ip>  <switch_udp_port> <pipe_num>
+        # Need to provide upward port and upper switch mac/ip
+        pipe_num = int(arg.split()[-1])
+        upward_port = int(arg.split()[0])
+        # self.set_upward_port.set_default_entry(upward_port)
+        self.ctrl.set_switch_type.set_default_entry_for_pipe(0,upward_port,pipe=pipe_num)
+        self.ctrl.udp_sender.add_udp_worker_for_pipe(0xffff,arg.split()[1],arg.split()[2],pipe=pipe_num)
+        
+        # set udp port for the worker
+        self.ctrl.udp_sender.set_udp_port_for_worker_for_pipe(0xffff,int(arg.split()[3]),pipe=pipe_num)
+        
 
     def do_show_bitmap(self, line):
         ''' Show the current bitmap values per slot index. The default is

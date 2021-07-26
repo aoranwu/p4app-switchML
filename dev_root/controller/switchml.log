@@ -1,19 +1,18 @@
-16:19:19 - INFO - SwitchML controller
-16:19:19 - INFO - Subscribe attempt #1
-16:19:19 - INFO - Subscribe response received 0
-16:19:19 - INFO - Connected to BFRT server 127.0.0.1:50052
-16:19:19 - INFO - Binding with p4_name switchml
-16:19:19 - INFO - Binding with p4_name switchml successful!!
-16:19:19 - INFO - Received switchml on GetForwarding on client 0, device 0
-16:19:19 - INFO - 49 front panel ports set in loopback mode
-16:19:19 - INFO - CPU port: 320
-16:19:30 - INFO - Setting up get_port_from_worker_id table...
-16:20:20 - INFO - Setting up set_switch_type table...
-16:20:20 - INFO - Added port: 1/0 100G none disable
-16:20:20 - INFO - Added port: 1/1 100G none disable
-16:20:20 - INFO - Added port: 1/2 100G none disable
-16:20:20 - INFO - gRPC server started
-16:21:08 - INFO - Added UDP worker 0:e6:5d:09:2e:a3:ac 198.19.200.48
-16:21:08 - INFO - Added UDP worker 1:9e:3e:ed:c0:b6:5c 198.19.200.47
-16:21:09 - INFO - gRPC server stopped
-16:21:09 - INFO - Stopping controller
+18:37:41 - INFO - SwitchML controller
+18:37:41 - INFO - Subscribe attempt #1
+18:37:41 - INFO - Subscribe response received 0
+18:37:41 - INFO - Connected to BFRT server 127.0.0.1:50052
+18:37:41 - INFO - Binding with p4_name switchml
+18:37:41 - INFO - Binding with p4_name switchml successful!!
+18:37:41 - INFO - Received switchml on GetForwarding on client 0, device 0
+18:37:56 - INFO - 49 front panel ports set in loopback mode
+18:37:56 - INFO - CPU port: 320
+18:38:03 - INFO - Setting up get_port_from_worker_id table...
+18:38:38 - INFO - Setting up set_switch_type table...
+18:38:38 - INFO - Added port: 1/0 100G none disable
+18:38:38 - INFO - Added port: 2/0 100G none disable
+18:38:38 - INFO - gRPC server started
+18:40:03 - INFO - Added UDP worker 0:de:08:be:d7:01:47 198.19.200.50
+18:40:03 - INFO - Added UDP worker 1:62:68:1b:cb:18:05 198.19.200.49
+18:40:05 - INFO - gRPC server stopped
+18:40:05 - INFO - Stopping controller

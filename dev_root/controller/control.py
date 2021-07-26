@@ -27,6 +27,11 @@ class Control(object):
         # Child classes must set tables
         self.tables = None
 
+        # targets for each pipe
+        self.targets = []
+        for i in range(4):
+            self.targets.append(gc.Target(device_id=0,pipe_id=i))
+
     def _clear(self):
         ''' Remove all existing entries in the tables '''
         if self.tables is not None:

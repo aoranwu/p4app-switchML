@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 import logging
-
+import bfrt_grpc.bfruntime_pb2 as bfruntime_pb2
 from control import Control
 
 
@@ -107,11 +107,42 @@ class UDPSender(Control):
             ], 'Egress.udp_sender.set_dst_addr')
         ])
     
+    def add_udp_worker_for_pipe(self, worker_id, worker_mac, worker_ip, pipe):
+        ''' Add SwitchML UDP entry.
+
+            Keyword arguments:
+                worker_id -- worker rank
+                worker_mac -- worker MAC address
+                worker_ip -- worker IP address
+        '''
+        self.dst_addr.attribute_entry_scope_set(self.target, predefined_pipe_scope=True,
+                                                            predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
+        self.dst_addr.entry_add(self.targets[pipe], [
+            self.dst_addr.make_key(
+                [self.gc.KeyTuple('eg_md.switchml_md.worker_id', worker_id)])
+        ], [
+            self.dst_addr.make_data([
+                self.gc.DataTuple('eth_dst_addr', worker_mac),
+                self.gc.DataTuple('ip_dst_addr', worker_ip)
+            ], 'Egress.udp_sender.set_dst_addr')
+        ])
+    
     # Set udp port for a worker with worker_id
     def set_udp_port_for_worker(self,worker_id,udp_port=0xbeef):
         # self.logger.info("Set udp port to be {} for worker with id {}".format(udp_port,worker_id))
         self.set_dst_udp_port_tbl.entry_add(
             self.target,
+            [self.set_dst_udp_port_tbl.make_key([self.gc.KeyTuple('eg_md.switchml_md.worker_id',
+                                              worker_id)])],
+            [self.set_dst_udp_port_tbl.make_data([self.gc.DataTuple('dst_port', udp_port)],
+                                  'Egress.udp_sender.set_dst_udp_port')])
+
+    def set_udp_port_for_worker_for_pipe(self,worker_id,udp_port=0xbeef,pipe=0):
+        # self.logger.info("Set udp port to be {} for worker with id {}".format(udp_port,worker_id))
+        self.set_dst_udp_port_tbl.attribute_entry_scope_set(self.target, predefined_pipe_scope=True,
+                                                            predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
+        self.set_dst_udp_port_tbl.entry_add(
+            self.targets[pipe],
             [self.set_dst_udp_port_tbl.make_key([self.gc.KeyTuple('eg_md.switchml_md.worker_id',
                                               worker_id)])],
             [self.set_dst_udp_port_tbl.make_data([self.gc.DataTuple('dst_port', udp_port)],

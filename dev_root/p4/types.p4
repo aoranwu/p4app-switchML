@@ -234,11 +234,14 @@ header switchml_md_h {
     PortId_t upward_port;
 
     bit<4> msg_type;
-    //unused
+    // mgid_offset_factor
     bit<2> unused;
 
     // store the worker id for multi-switch retransmission
     worker_id_t original_worker_id;
+
+    MulticastGroupId_t mgid_offset_factor;
+
 }
 
 // Bridged metadata header for RDMA

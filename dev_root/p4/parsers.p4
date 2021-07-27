@@ -50,10 +50,12 @@ parser IngressParser(
         transition select(ig_intr_md.ingress_port) {
             64: parse_recirculate; // pipe 0 CPU Eth port
             68: parse_recirculate; // pipe 0 recirc port
+            196: parse_recirculate; // pipe 1 recirc port
+            324: parse_recirculate; // pipe 2 recirc port
             320: parse_ethernet;   // pipe 2 CPU PCIe port
-            0x080 &&& 0x180: parse_recirculate; // all pipe 1 ports
-            0x100 &&& 0x180: parse_recirculate; // all pipe 2 ports
-            0x180 &&& 0x180: parse_recirculate; // all pipe 3 ports
+            // 0x080 &&& 0x180: parse_recirculate; // all pipe 1 ports
+            // 0x100 &&& 0x180: parse_recirculate; // all pipe 2 ports
+            // 0x180 &&& 0x180: parse_recirculate; // all pipe 3 ports
             default:  parse_ethernet;
         }
     }

@@ -60,6 +60,20 @@ class UDPSender(Control):
                 self.gc.DataTuple('switch_mac', switch_mac),
                 self.gc.DataTuple('switch_ip', switch_ip)
             ], 'Egress.udp_sender.set_switch_mac_and_ip'))
+    
+    def set_switch_mac_and_ip_for_pipe(self, switch_mac, switch_ip, pipe):
+        ''' Set switch MAC and IP '''
+
+        # # Clear table
+        # self.switch_mac_and_ip.default_entry_reset(self.target)
+        self.switch_mac_and_ip.attribute_entry_scope_set(self.target, predefined_pipe_scope=True,
+                                                            predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
+        self.switch_mac_and_ip.default_entry_set(
+            self.targets[pipe],
+            self.switch_mac_and_ip.make_data([
+                self.gc.DataTuple('switch_mac', switch_mac),
+                self.gc.DataTuple('switch_ip', switch_ip)
+            ], 'Egress.udp_sender.set_switch_mac_and_ip'))
 
     def clear_udp_workers(self):
         ''' Remove all UDP workers '''

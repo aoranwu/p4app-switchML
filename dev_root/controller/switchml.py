@@ -43,13 +43,11 @@ from next_step_selector import NextStepSelector
 from rdma_sender import RDMASender
 from udp_sender import UDPSender
 from set_switch_type import SetSwitchType
+from set_mgid_offset_factor import SetMgidOffsetFactor
 from get_port_from_worker_id import GetPortFromWorkerID
 from grpc_server import GRPCServer
 from cli import Cli
 from common import front_panel_regex, mac_address_regex, validate_ip
-
-# change to False when running on real hardwaresho
-run_on_model = True
 
 class SwitchML(object):
     '''SwitchML controller'''
@@ -77,6 +75,9 @@ class SwitchML(object):
         # Multicast group ID -> replication ID (= node ID) -> port
         self.multicast_groups = {self.all_ports_mgid: {}}
 
+        self.switch_macs = ["06:00:00:00:00:02","06:00:00:00:00:03","06:00:00:00:00:01"]
+        self.switch_ips = ["198.19.200.202","198.19.200.203","198.19.200.201"] 
+
     def critical_error(self, msg):
         self.log.critical(msg)
         print(msg, file=sys.stderr)
@@ -92,8 +93,11 @@ class SwitchML(object):
         bfrt_ip,
         bfrt_port,
         ports_file,
+        use_multipipe,
+        use_model
     ):
-
+        self.use_multipipe = use_multipipe
+        self.use_model = use_model
         # Device 0
         self.dev = 0
         # Target all pipes
@@ -140,7 +144,7 @@ class SwitchML(object):
 
             # Enable loopback on PktGen ports
             pktgen_ports = [192, 448]
-            if not run_on_model:
+            if not self.use_model:
                 print('\nYou must \'remove\' the ports in the BF ucli:\n')
                 for p in pktgen_ports:
                     print('    bf-sde> dvm rmv_port 0 {}'.format(p))
@@ -187,13 +191,14 @@ class SwitchML(object):
                 self.processors.append(p)
             # Next step selector
             self.next_step_selector = NextStepSelector(self.target, gc,
-                                                       self.bfrt_info)
+                                                       self.bfrt_info,self.use_multipipe, self.use_model)
             # RDMA sender
             self.rdma_sender = RDMASender(self.target, gc, self.bfrt_info)
             # UDP sender
             self.udp_sender = UDPSender(self.target, gc, self.bfrt_info)
 
             self.set_switch_type = SetSwitchType(gc, self.bfrt_info)
+            self.set_mgid_offset_factor = SetMgidOffsetFactor(gc, self.bfrt_info)
 
             # Add multicast group for flood
             self.pre.add_multicast_group(self.all_ports_mgid)
@@ -204,7 +209,7 @@ class SwitchML(object):
                 self.critical_error(ports)
 
             # Set switch addresses
-            self.set_switch_mac_and_ip(switch_mac, switch_ip)
+            self.set_switch_mac_and_ip(switch_mac, switch_ip, self.use_multipipe)
 
             # CLI setup
             self.cli = Cli()
@@ -321,7 +326,7 @@ class SwitchML(object):
 
         return (True, ports)
 
-    def set_switch_mac_and_ip(self, switch_mac, switch_ip):
+    def set_switch_mac_and_ip(self, switch_mac, switch_ip, use_mps):
         ''' Set switch MAC and IP '''
         self.switch_mac = switch_mac.upper()
         self.switch_ip = switch_ip
@@ -331,7 +336,12 @@ class SwitchML(object):
                                                  self.switch_ip)
         self.udp_receiver.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
         self.rdma_sender.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
-        self.udp_sender.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
+        if not use_mps:
+            self.udp_sender.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
+        else:
+            for i in range(3):
+                self.udp_sender.set_switch_mac_and_ip_for_pipe(self.switch_macs[i], self.switch_ips[i], i)
+
 
     def get_switch_mac_and_ip(self):
         ''' Get switch MAC and IP '''
@@ -567,6 +577,7 @@ class SwitchML(object):
         # Multicast groups below 0x8000 are used for sessions
         # (the mgid is the session id)
         session_id = session_id % 0x8000
+        session_id += pipe
 
         # Add UDP receiver/sender entries
         success, error_msg = self.udp_receiver.add_udp_worker_for_pipe(
@@ -583,26 +594,26 @@ class SwitchML(object):
         self.get_port_from_worker_id.set_port_for_worker_id_for_pipe(worker_id, dev_port, pipe)
 
         # Add multicast group if not present
-        if 1000*pipe+session_id not in self.multicast_groups:
-            self.pre.add_multicast_group_for_pipe(session_id, pipe)
-            self.multicast_groups[1000*pipe+session_id] = {}
+        if session_id not in self.multicast_groups:
+            self.pre.add_multicast_group(session_id)
+            self.multicast_groups[session_id] = {}
 
         if worker_id in self.multicast_groups[
-                1000*pipe+session_id] and self.multicast_groups[1000*pipe+session_id][
+                session_id] and self.multicast_groups[session_id][
                     worker_id] != dev_port:
             # Existing node with different port, remove it
-            self.pre.remove_multicast_node_for_pipe(worker_id,pipe)
-            del self.multicast_groups[1000*pipe+session_id][worker_id]
+            self.pre.remove_multicast_node(worker_id)
+            del self.multicast_groups[session_id][worker_id]
 
         # Add multicast node if not present
-        if worker_id not in self.multicast_groups[1000*pipe+session_id]:
+        if worker_id not in self.multicast_groups[session_id]:
             # Add new node
-            success, error_msg = self.pre.add_multicast_node_for_pipe(
-                session_id, worker_id, dev_port, pipe)
+            success, error_msg = self.pre.add_multicast_node(
+                session_id, worker_id, dev_port)
             if not success:
                 return (False, error_msg)
 
-            self.multicast_groups[1000*pipe + session_id][worker_id] = dev_port
+            self.multicast_groups[session_id][worker_id] = dev_port
 
         self.log.info('Added UDP worker {}:{} {}'.format(
             worker_id, worker_mac, worker_ip))
@@ -676,6 +687,16 @@ if __name__ == '__main__':
                            default='INFO',
                            choices=['ERROR', 'WARNING', 'INFO', 'DEBUG'],
                            help='Default: INFO')
+    
+    argparser.add_argument('--use-model',
+                           default=False,
+                           action='store_true',
+                           help='Whether this program is run on tofino model or not')
+    
+    argparser.add_argument('--use-multipipe',
+                           default=False,
+                           action='store_true',
+                           help='Whether this program uses multiple pipes to simulate multiple switches')
 
     args = argparser.parse_args()
 
@@ -704,7 +725,7 @@ if __name__ == '__main__':
 
     ctrl = SwitchML()
     ctrl.setup(args.program, args.switch_mac, args.switch_ip, args.bfrt_ip,
-               args.bfrt_port, args.ports)
+               args.bfrt_port, args.ports, args.use_multipipe, args.use_model)
 
     # Start controller
     ctrl.run()

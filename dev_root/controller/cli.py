@@ -499,6 +499,22 @@ class Cli(Cmd, object):
         '''
         self._show_workers(self.ctrl.udp_sender, self.ctrl.udp_receiver, line)
 
+    
+    def do_set_mgid_offset_factor(self,line):
+        ''' set mgid_offset_factor
+            mgid will be mgid_offset_factor+session_id
+            Usage: set_mgid_offset_factor <mgid_offset_factor>
+        '''
+        self.ctrl.set_mgid_offset_factor.set_default_entry(int(line))
+    
+    def do_set_mgid_offset_factor_for_pipe(self,line):
+        ''' set mgid_offset_factor for pipe
+            mgid will be mgid_offset_factor+session_id
+            Usage: set_mgid_offset_factor_for_pipe <mgid_offset_factor> <pipe_num>
+        '''
+        result = line.split()
+        self.ctrl.set_mgid_offset_factor.set_default_entry_for_pipe(int(result[0]),int(result[1]))
+
     def do_worker_add_udp(self,line):
         ''' Add udp worker in CLI
             For testing purpose only

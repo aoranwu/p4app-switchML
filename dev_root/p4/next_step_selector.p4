@@ -124,7 +124,14 @@ control NextStepSelector(
 
         // Send to multicast group; egress will fill in destination IP and MAC address
         // ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid;
-        ig_tm_md.mcast_grp_a = 0x0;
+        // ig_tm_md.mcast_grp_a = ((bit<16>)ig_md.switchml_md.mgid_offset_factor)*1000+0x0;
+        // ig_tm_md.mcast_grp_a = ((bit<16>)ig_md.switchml_md.mgid_offset_factor)*1000+0x0;
+        // ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid_offset_factor+0x0;
+        // ig_tm_md.mcast_grp_a = ((bit<16>)ig_md.switchml_md.mgid_offset_factor)+0x0;
+        ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid_offset_factor+0x0;
+
+
+
         ig_tm_md.level1_exclusion_id = null_level1_exclusion_id; // don't exclude any nodes
         ig_md.switchml_md.packet_type = packet_type_t.BROADCAST;
         ig_tm_md.bypass_egress = 1w0;

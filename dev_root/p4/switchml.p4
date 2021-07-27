@@ -37,6 +37,7 @@
 #include "set_switch_type.p4"
 #include "set_upward_port.p4"
 #include "get_port_from_worker_id.p4"
+#include "set_mgid_offset_factor.p4"
 
 control Ingress(
     inout header_t hdr,
@@ -63,6 +64,7 @@ control Ingress(
     SetSwitchType() set_switch;
     SetUpwardPort() set_upward_port;
     GetPortFromWorkerID() get_port_from_worker_id;
+    SetMgidOffsetFactor() set_mgid_offset_factor;
 
     NextStepSelector() next_step_selector;
 
@@ -106,14 +108,14 @@ control Ingress(
         set_switch.apply(ig_md.switchml_md);
         // set_upward_port.apply(ig_md.switchml_md);
         ig_md.switchml_md.msg_type = hdr.switchml.msg_type;
-
+        set_mgid_offset_factor.apply(ig_md.switchml_md);
 
         if(hdr.switchml.msg_type==msg_type_t.DIST){
 
 
             // need to modify
             ig_md.switchml_md.packet_size = hdr.switchml.size;
-            ig_md.switchml_md.dst_port = hdr.udp.src_port;
+            // ig_md.switchml_md.dst_port = hdr.udp.src_port;
             ig_md.switchml_md.src_port = hdr.udp.dst_port;
             ig_md.switchml_md.pool_index = hdr.switchml.pool_index[13:0] ++ hdr.switchml.pool_index[15:15];
             // Why d0 and d1 are invalid by default????
@@ -135,7 +137,7 @@ control Ingress(
             // send to multicast group; egress will fill in destination IP and MAC address
             // hardcoded according to control plane code here
             // ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid;
-            ig_tm_md.mcast_grp_a = 0x0;
+            ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid_offset_factor+0x0;
             ig_tm_md.level1_exclusion_id = null_level1_exclusion_id; // don't exclude any nodes
             ig_md.switchml_md.packet_type = packet_type_t.BROADCAST;
             ig_tm_md.bypass_egress = 1w0;
@@ -162,7 +164,7 @@ control Ingress(
 
             // set up the egress port according to original worker id
             // ig_tm_md.ucast_egress_port = ig_md.switchml_md.ingress_port;
-            ig_tm_md.ucast_egress_port = 1;
+            // ig_tm_md.ucast_egress_port = 1;
             // set up the worker id
             ig_md.switchml_md.worker_id = ig_md.switchml_md.original_worker_id;
 

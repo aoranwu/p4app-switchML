@@ -35,6 +35,9 @@ class UDPReceiver(Control):
         self.switch_mac = None
         self.switch_ip = None
 
+        self.switch_macs = ["06:00:00:00:00:02","06:00:00:00:00:03","06:00:00:00:00:01"]
+        self.switch_ips = ["198.19.200.202","198.19.200.203","198.19.200.201"] 
+
         # Annotations
         self.table.info.key_field_annotation_add('hdr.ethernet.dst_addr', 'mac')
         self.table.info.key_field_annotation_add('hdr.ethernet.src_addr', 'mac')
@@ -208,11 +211,11 @@ class UDPReceiver(Control):
                     # Match on Ethernet addrs, IPs and port
                     self.gc.KeyTuple('hdr.ethernet.src_addr', worker_mac,
                                      worker_mac_mask),
-                    self.gc.KeyTuple('hdr.ethernet.dst_addr', self.switch_mac,
+                    self.gc.KeyTuple('hdr.ethernet.dst_addr', self.switch_macs[pipe],
                                      'FF:FF:FF:FF:FF:FF'),
                     self.gc.KeyTuple('hdr.ipv4.src_addr', worker_ip,
                                      worker_ip_mask),
-                    self.gc.KeyTuple('hdr.ipv4.dst_addr', self.switch_ip,
+                    self.gc.KeyTuple('hdr.ipv4.dst_addr', self.switch_ips[pipe],
                                      '255.255.255.255'),
                     self.gc.KeyTuple('hdr.udp.dst_port', udp_port, udp_mask),
                     # Ignore parser errors

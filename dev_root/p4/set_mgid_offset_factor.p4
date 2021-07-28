@@ -5,11 +5,11 @@
 #include "headers.p4"
 
 // Set switch type to be root or non-root
-control SetMgidOffsetFactor(inout switchml_md_h switchml_md){
+control SetMgidOffsetFactor(inout ingress_metadata_t ig_md){
     
     action set_mgid_offset_factor(bit<16> offset_factor){
         // ig_md.switchml_md.is_root_switch = 0;
-        switchml_md.mgid_offset_factor = offset_factor;
+        ig_md.mgid_offset_factor = offset_factor;
     }
 
     table set_mgid_offset_factor_tbl{

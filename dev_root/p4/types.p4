@@ -236,11 +236,11 @@ header switchml_md_h {
     bit<4> msg_type;
     // mgid_offset_factor
     bit<2> unused;
-
     // store the worker id for multi-switch retransmission
     worker_id_t original_worker_id;
 
-    MulticastGroupId_t mgid_offset_factor;
+
+    
 
 }
 
@@ -268,6 +268,8 @@ struct ingress_metadata_t {
     // switch MAC and IP
     mac_addr_t switch_mac;
     ipv4_addr_t switch_ip;
+
+    MulticastGroupId_t mgid_offset_factor;
 
     port_metadata_t port_metadata;
 }

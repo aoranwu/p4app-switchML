@@ -128,7 +128,10 @@ control NextStepSelector(
         // ig_tm_md.mcast_grp_a = ((bit<16>)ig_md.switchml_md.mgid_offset_factor)*1000+0x0;
         // ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid_offset_factor+0x0;
         // ig_tm_md.mcast_grp_a = ((bit<16>)ig_md.switchml_md.mgid_offset_factor)+0x0;
-        ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid_offset_factor+0x0;
+        // ig_tm_md.mcast_grp_a = ig_md.switchml_md.mgid_offset_factor+0x0;
+        // ig_tm_md.mcast_grp_a = 0x0;
+        ig_tm_md.mcast_grp_a = ig_md.mgid_offset_factor+0x0;
+
 
 
 

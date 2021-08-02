@@ -223,30 +223,61 @@ class SwitchML(object):
             self.cli = Cli()
             self.cli.setup(self, prompt='SwitchML', name='SwitchML controller')
 
-            if switch_conf_file is not None:
-                with open(switch_conf_file) as f:
-                    switch_confs = yaml.safe_load(f)
-                    switch_conf = switch_confs[switch_name]
-                    self.is_root_switch = switch_conf["is_root_switch"]
-                    if self.is_root_switch:
-                        self.set_switch_type.set_default_entry(1)
-                        self.lower_layer_switches = switch_conf["lower_layer_switches"]
-                        for lower_layer_switch in self.lower_layer_switches:
-                            line = " ".join([str(lower_layer_switch['rank']),
-                            str(len(self.lower_layer_switches)),lower_layer_switch['mac_address'],
-                            lower_layer_switch['ip_address'],str(lower_layer_switch['udp_port'])])
-                            self.cli.do_worker_add_udp(line)
-                    else:
-                        line = " ".join([str(switch_conf['upward_port']),
-                                switch_conf['upward_switch_mac'],switch_conf['upward_switch_ip'],
-                                str(switch_conf['upward_udp_port'])])
-                        self.cli.do_set_non_root_switch(line)
-                        workers = switch_conf['workers']
-                        for worker in workers:
-                            line = " ".join([str(worker['rank']),
-                            str(len(workers)),worker['mac_address'],
-                            worker['ip_address'],str(worker['udp_port'])])
-                            self.cli.do_worker_add_udp(line)
+            # if switch_conf_file is not None:
+            #     if not use_multipipe:
+            #         with open(switch_conf_file) as f:
+            #             switch_confs = yaml.safe_load(f)
+            #             switch_conf = switch_confs[switch_name]
+            #             self.is_root_switch = switch_conf["is_root_switch"]
+            #             if self.is_root_switch:
+            #                 self.set_switch_type.set_default_entry(1)
+            #                 self.lower_layer_switches = switch_conf["lower_layer_switches"]
+            #                 for lower_layer_switch in self.lower_layer_switches:
+            #                     line = " ".join([str(lower_layer_switch['rank']),
+            #                     str(len(self.lower_layer_switches)),lower_layer_switch['mac_address'],
+            #                     lower_layer_switch['ip_address'],str(lower_layer_switch['udp_port'])])
+            #                     self.cli.do_worker_add_udp(line)
+            #             else:
+            #                 line = " ".join([str(switch_conf['upward_port']),
+            #                         switch_conf['upward_switch_mac'],switch_conf['upward_switch_ip'],
+            #                         str(switch_conf['upward_udp_port'])])
+            #                 self.cli.do_set_non_root_switch(line)
+            #                 workers = switch_conf['workers']
+            #                 for worker in workers:
+            #                     line = " ".join([str(worker['rank']),
+            #                     str(len(workers)),worker['mac_address'],
+            #                     worker['ip_address'],str(worker['udp_port'])])
+            #                     self.cli.do_worker_add_udp(line)
+            #     else:
+            #         with open(switch_conf_file) as f:
+            #             pipe_confs = yaml.safe_load(f)
+            #             for pipe_conf in pipe_confs.values():
+            #                 pipe_num = pipe_conf['pipe_num']
+            #                 mgid_offset_factor = pipe_conf['mgid_offset_factor']
+            #                 is_root_switch = pipe_conf['is_root_switch']
+            #                 self.cli.do_set_mgid_offset_factor_for_pipe(" ".join([str(pipe_num),str(pipe_num)]))
+            #                 if is_root_switch:
+            #                     self.cli.do_set_root_switch_for_pipe(str(pipe_num))
+            #                     self.lower_layer_pipes = pipe_conf["lower_layer_switches"]
+            #                     for lower_layer_switch in self.lower_layer_pipes:
+            #                         line = " ".join([str(lower_layer_switch['rank']),
+            #                         str(len(self.lower_layer_pipes)),lower_layer_switch['mac_address'],
+            #                         lower_layer_switch['ip_address'],str(lower_layer_switch['udp_port']),str(pipe_num)])
+            #                         self.cli.do_worker_add_udp_for_pipe(line)
+            #                 else:
+            #                     line = " ".join([str(pipe_conf['upward_port']),
+            #                         pipe_conf['upward_switch_mac'],pipe_conf['upward_switch_ip'],
+            #                         str(pipe_conf['upward_udp_port']),str(pipe_num)])
+            #                     self.cli.do_set_non_root_switch_for_pipe(line)
+            #                     workers = pipe_conf['workers']
+            #                     for worker in workers:
+            #                         line = " ".join([str(worker['rank']),
+            #                         str(len(workers)),worker['mac_address'],
+            #                         worker['ip_address'],str(worker['udp_port']),str(pipe_num)])
+            #                         self.cli.do_worker_add_udp_for_pipe(line)
+
+                            
+
                         
 
             # Set up gRPC server

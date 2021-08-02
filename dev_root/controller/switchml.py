@@ -94,7 +94,9 @@ class SwitchML(object):
         bfrt_port,
         ports_file,
         use_multipipe,
-        use_model
+        use_model,
+        switch_name,
+        switch_conf_file
     ):
         self.use_multipipe = use_multipipe
         self.use_model = use_model
@@ -211,9 +213,41 @@ class SwitchML(object):
             # Set switch addresses
             self.set_switch_mac_and_ip(switch_mac, switch_ip, self.use_multipipe)
 
+            
+
+
+                
+
+
             # CLI setup
             self.cli = Cli()
             self.cli.setup(self, prompt='SwitchML', name='SwitchML controller')
+
+            if switch_conf_file is not None:
+                with open(switch_conf_file) as f:
+                    switch_confs = yaml.safe_load(f)
+                    switch_conf = switch_confs[switch_name]
+                    self.is_root_switch = switch_conf["is_root_switch"]
+                    if self.is_root_switch:
+                        self.set_switch_type.set_default_entry(1)
+                        self.lower_layer_switches = switch_conf["lower_layer_switches"]
+                        for lower_layer_switch in self.lower_layer_switches:
+                            line = " ".join([str(lower_layer_switch['rank']),
+                            str(len(self.lower_layer_switches)),lower_layer_switch['mac_address'],
+                            lower_layer_switch['ip_address'],str(lower_layer_switch['udp_port'])])
+                            self.cli.do_worker_add_udp(line)
+                    else:
+                        line = " ".join([str(switch_conf['upward_port']),
+                                switch_conf['upward_switch_mac'],switch_conf['upward_switch_ip'],
+                                str(switch_conf['upward_udp_port'])])
+                        self.cli.do_set_non_root_switch(line)
+                        workers = switch_conf['workers']
+                        for worker in workers:
+                            line = " ".join([str(worker['rank']),
+                            str(len(workers)),worker['mac_address'],
+                            worker['ip_address'],str(worker['udp_port'])])
+                            self.cli.do_worker_add_udp(line)
+                        
 
             # Set up gRPC server
             self.grpc_server = GRPCServer(ip='[::]', port=50099)
@@ -698,6 +732,20 @@ if __name__ == '__main__':
                            action='store_true',
                            help='Whether this program uses multiple pipes to simulate multiple switches')
 
+    argparser.add_argument(
+        '--switch-name',
+        type=str,
+        default=None,
+        help=
+        'Name for the switch this controller is running on. Default: None')
+    
+    argparser.add_argument(
+        '--switch-conf-file',
+        type=str,
+        default=None,
+        help=
+        'YAML file describing hierarchical switch connection architecture and configuration. Default: None')
+
     args = argparser.parse_args()
 
     # Configure logging
@@ -725,7 +773,7 @@ if __name__ == '__main__':
 
     ctrl = SwitchML()
     ctrl.setup(args.program, args.switch_mac, args.switch_ip, args.bfrt_ip,
-               args.bfrt_port, args.ports, args.use_multipipe, args.use_model)
+               args.bfrt_port, args.ports, args.use_multipipe, args.use_model, args.switch_name, args.switch_conf_file)
 
     # Start controller
     ctrl.run()

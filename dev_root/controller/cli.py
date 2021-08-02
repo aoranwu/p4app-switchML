@@ -589,7 +589,7 @@ class Cli(Cmd, object):
     #     self.ctrl.set_upward_port.set_default_entry(upward_port)
     #     self.ctrl.udp_sender.add_udp_worker(0xffff,arg.split()[1],arg.split()[2])
     def do_set_non_root_switch(self, arg):
-        # set_non_root_switch <upward_port> <upper_switch_mac> <upper_switch_ip>  [switch_udp_port]
+        # set_non_root_switch <upward_port> <upper_switch_mac> <upper_switch_ip>  [upward_switch_udp_port]
         # Need to provide upward port and upper switch mac/ip
         upward_port = int(arg.split()[0])
         # self.set_upward_port.set_default_entry(upward_port)

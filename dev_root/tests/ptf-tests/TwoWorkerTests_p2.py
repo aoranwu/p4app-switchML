@@ -136,7 +136,7 @@ class BasicReduction(TwoWorkerTest):
         # self.expected_pktW0S0['SwitchML'].original_worker_id=1
         # verify_packet(self, self.expected_pktW0S0, 128)
         # verify_packet(self, self.expected_pktW1S0, 132)
-        verify_packet(self, self.expected_pktW0S0, 128)
+        verify_packet(self, self.expected_pktW0S0, 128, timeout=5)
 
 
 class RetransmitAfterReduction(TwoWorkerTest):

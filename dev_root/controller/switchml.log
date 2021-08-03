@@ -1,27 +1,19 @@
-19:34:09 - INFO - SwitchML controller
-19:34:09 - INFO - Subscribe attempt #1
-19:34:09 - INFO - Subscribe response received 0
-19:34:09 - INFO - Connected to BFRT server 127.0.0.1:50052
-19:34:09 - INFO - Binding with p4_name switchml
-19:34:09 - INFO - Binding with p4_name switchml successful!!
-19:34:09 - INFO - Received switchml on GetForwarding on client 0, device 0
-19:34:23 - INFO - 49 front panel ports set in loopback mode
-19:34:23 - INFO - CPU port: 320
-19:34:30 - INFO - Setting up get_port_from_worker_id table...
-19:35:06 - INFO - Setting up set_switch_type table...
-19:35:06 - INFO - Setting up SetMgidOffsetFactor table...
-19:35:06 - INFO - Added port: 1/0 100G none disable
-19:35:06 - INFO - Added port: 2/0 100G none disable
-19:35:06 - INFO - Added port: 17/0 100G none disable
-19:35:06 - INFO - Added port: 18/0 100G none disable
-19:35:06 - INFO - Added port: 33/0 100G none disable
-19:35:06 - INFO - Added port: 34/0 100G none disable
-19:35:06 - INFO - gRPC server started
-19:35:09 - INFO - Added UDP worker 0:06:00:00:00:00:02 198.19.200.202
-19:35:09 - INFO - Added UDP worker 1:06:00:00:00:00:03 198.19.200.203
-19:35:09 - INFO - Added UDP worker 2:de:08:be:d7:01:47 198.19.200.50
-19:35:09 - INFO - Added UDP worker 3:62:68:1b:cb:18:05 198.19.200.49
-19:35:09 - INFO - Added UDP worker 4:86:bd:7b:5c:b9:2b 198.19.200.48
-19:35:09 - INFO - Added UDP worker 5:7e:0a:ae:fb:53:df 198.19.200.47
-19:35:09 - INFO - gRPC server stopped
-19:35:09 - INFO - Stopping controller
+19:40:48 - INFO - SwitchML controller
+19:40:48 - INFO - Subscribe attempt #1
+19:40:48 - INFO - Subscribe response received 0
+19:40:48 - INFO - Connected to BFRT server 127.0.0.1:50052
+19:40:48 - INFO - Binding with p4_name switchml
+19:40:48 - INFO - Binding with p4_name switchml successful!!
+19:40:48 - INFO - Received switchml on GetForwarding on client 0, device 0
+19:41:01 - INFO - 49 front panel ports set in loopback mode
+19:41:01 - INFO - CPU port: 320
+19:41:18 - INFO - Setting up get_port_from_worker_id table...
+19:42:45 - INFO - Setting up set_switch_type table...
+19:42:45 - INFO - Setting up SetMgidOffsetFactor table...
+19:42:45 - INFO - Added port: 1/0 100G none disable
+19:42:45 - INFO - Added port: 1/1 100G none disable
+19:42:45 - INFO - Added port: 1/2 100G none disable
+19:42:46 - INFO - Added UDP worker 0:ca:0c:b1:05:46:77 198.19.200.50
+19:42:46 - INFO - Added UDP worker 1:02:ec:cd:ec:30:c2 1919:43:11 - INFO - gRPC server stopped
+19:43:11 - I19:43:13 - INFO - gRPC server stopped
+19:43:13 - INFO - Stopping controller

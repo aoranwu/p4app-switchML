@@ -96,7 +96,7 @@ class SwitchML(object):
         use_multipipe,
         use_model,
         switch_name,
-        switch_conf_file
+        switch_conf_file=None
     ):
         self.use_multipipe = use_multipipe
         self.use_model = use_model
@@ -221,7 +221,7 @@ class SwitchML(object):
 
             # CLI setup
             self.cli = Cli()
-            self.cli.setup(self, prompt='SwitchML', name='SwitchML controller')
+            self.cli.setup(controller=self, prompt='SwitchML', name='SwitchML controller')
 
             if switch_conf_file is not None:
                 if not use_multipipe:
@@ -694,7 +694,7 @@ class SwitchML(object):
             self.log.info('gRPC server started')
 
             # Start CLI
-            self.cli.run()
+            # self.cli.run()
 
             # Stop gRPC server and event loop
             self.event_loop.call_soon_threadsafe(self.grpc_server.stop)
@@ -808,6 +808,9 @@ if __name__ == '__main__':
 
     # Start controller
     ctrl.run()
+    
+    
+    ctrl.cli.run()
 
     # Flush log, stdout, stderr
     sys.stdout.flush()

@@ -40,12 +40,13 @@ class Cli(Cmd, object):
         self.log = logging.getLogger(__name__)
 
     def setup(self,
-              controller,
+              controllers=None,
+              controller=None,
               prompt='',
               stdin=None,
               use_rawinput=None,
               name=''):
-
+        self.ctrls = controllers
         self.ctrl = controller
         self.prompt = '{}>'.format(prompt)
         self.name = name
@@ -397,14 +398,14 @@ class Cli(Cmd, object):
 
         # Merge sent and received
         for id in sent.keys():
-            if id not in recvd:
+            if id not in recvd and id!=0xffff:
                 self.log.error(
                     'Sender and Receiver entries mismatch. Missing worker {}'.
                     format(id))
                 self.error('Unexpected error. See log for details')
                 return
-
-            recvd[id].update(sent[id])
+            if id!=0xffff:
+                recvd[id].update(sent[id])
 
         ids = sorted(recvd.keys())
 
@@ -425,7 +426,8 @@ class Cli(Cmd, object):
         msg = header1_format_string.format(
             '', 'Received', 'Sent') + format_string.format(**header2)
         for id in ids:
-            msg += format_string.format(ID=id, **recvd[id])
+            if id!=0xffff:
+                msg += format_string.format(ID=id, **recvd[id])
         self.out(msg)
 
     def do_show_rdma_workers(self, line):

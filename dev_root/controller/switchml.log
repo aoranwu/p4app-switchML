@@ -1,12 +1,20 @@
-11:38:17 - INFO - SwitchML controller
-11:38:17 - INFO - Subscribe attempt #1
-11:38:18 - INFO - Subscribe timeout exceeded 1s
-11:38:18 - INFO - Subscribe attempt #2
-11:38:19 - INFO - Subscribe timeout exceeded 1s
-11:38:19 - INFO - Subscribe attempt #3
-11:38:20 - INFO - Subscribe timeout exceeded 1s
-11:38:20 - INFO - Subscribe attempt #4
-11:38:21 - INFO - Subscribe timeout exceeded 1s
-11:38:21 - INFO - Subscribe attempt #5
-11:38:22 - INFO - Subscribe timeout exceeded 1s
-11:38:22 - CRITICAL - Failed to subscribe to server at 192.168.1.2:50052
+15:25:21 - INFO - SwitchML controller
+15:25:22 - INFO - Subscribe attempt #1
+15:25:22 - INFO - Subscribe response received 0
+15:25:22 - INFO - Connected to BFRT server 127.0.0.1:50052
+15:25:22 - INFO - Binding with p4_name switchml
+15:25:22 - INFO - Binding with p4_name switchml successful!!
+15:25:22 - INFO - Received switchml on GetForwarding on client 0, device 0
+15:25:22 - INFO - 49 front panel ports set in loopback mode
+15:25:22 - INFO - CPU port: 320
+15:25:37 - INFO - Setting up get_port_from_worker_id table...
+15:26:47 - INFO - Setting up set_switch_type table...
+15:26:47 - INFO - Setting up SetMgidOffsetFactor table...
+15:26:47 - INFO - Added port: 1/0 100G none disable
+15:26:47 - INFO - Added port: 1/1 100G none disable
+15:26:47 - INFO - Added port: 1/2 100G none disable
+15:26:47 - INFO - Added UDP worker 0:e6:5d:09:2e:a3:ac 198.19.200.48
+15:26:47 - INFO - Added UDP worker 1:9e:3e:ed:c0:b6:5c 198.19.200.47
+15:26:47 - INFO - gRPC server started
+15:26:47 - INFO - gRPC server stopped
+15:26:47 - INFO - Stopping controller

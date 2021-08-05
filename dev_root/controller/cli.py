@@ -136,12 +136,7 @@ class Cli(Cmd, object):
                 msg += '{}: {}\n'.format(i, readline.get_history_item(i + 1))
             self.out(msg)
 
-    # Commands
-    def do_show_ports(self, line):
-        ''' Show active ports. If a front-panel/lane is provided,
-            only that port will be shown.
-        '''
-
+    def _show_ports(self,line):
         port = None
         lane = None
         stats = None
@@ -199,6 +194,32 @@ class Cli(Cmd, object):
             msg += format_string.format(**v)
         self.out(msg)
 
+
+    # Commands
+    def do_show_ports(self, line):
+        ''' Show active ports. If a front-panel/lane is provided,
+            only that port will be shown.
+        '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_ports(line)
+        else:
+            for sw in self.ctrls.keys():
+                print('Switch name: {}'.format(sw))
+                self.ctrl = self.ctrls[sw]
+                self._show_ports(line)
+        if with_ctrls:
+            self.ctrl = None
+
+        
+        
+
+        
     def do_set_switch_address(self, line):
         ''' Set switch MAC and IP to be used for SwitchML.
             Usage: set_address <MAC address> <IPv4 address>

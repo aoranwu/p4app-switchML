@@ -219,11 +219,7 @@ class Cli(Cmd, object):
         
         
 
-        
-    def do_set_switch_address(self, line):
-        ''' Set switch MAC and IP to be used for SwitchML.
-            Usage: set_address <MAC address> <IPv4 address>
-        '''
+    def _set_switch_address(self, line):
 
         try:
             if not line:
@@ -244,16 +240,56 @@ class Cli(Cmd, object):
 
         except CommandError as e:
             self.error(e)
+        
+    def do_set_switch_address(self, line):
+        ''' Set switch MAC and IP to be used for SwitchML.
+            Usage: set_address <MAC address> <IPv4 address> <Switch name>
+        '''
 
-    def do_show_switch_address(self, line):
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._set_switch_address(line)
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                self._set_switch_address(line)
+        if with_ctrls:
+            self.ctrl = None
+
+
+    def _show_switch_address(self, line):
         ''' Show switch MAC and IP '''
         if line:
             self.error('Unknown parameter: {}'.format(line))
         else:
             mac, ip = self.ctrl.get_switch_mac_and_ip()
             self.out('Switch MAC: {} IP: {}'.format(mac, ip))
+    
+    def do_show_switch_address(self, line):
+        ''' Show switch MAC and IP '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_switch_address(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_switch_address(line.strip())
+        if with_ctrls:
+            self.ctrl = None
 
-    def do_show_forwarding_table(self, line):
+
+    def _show_forwarding_table(self, line):
         ''' Show the forwarding table. If a MAC address is provided,
         only the entry for that address (if present) will be shown
         '''
@@ -313,7 +349,28 @@ class Cli(Cmd, object):
         except CommandError as e:
             self.error(e)
 
-    def do_set_drop_probabilities(self, line):
+
+    def do_show_forwarding_table(self, line):
+        ''' Show the forwarding table. If a MAC address is provided,
+        only the entry for that address (if present) will be shown
+        '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_forwarding_table(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_forwarding_table(line.strip())
+        if with_ctrls:
+            self.ctrl = None
+        
+    def _set_drop_probabilities(self, line):
         ''' Set ingress and egress drop probabilities for simulated drops.
             Usage: set_drop_probabilities <ingress probability> <egress probability>
         '''
@@ -343,7 +400,28 @@ class Cli(Cmd, object):
         except CommandError as e:
             self.error(e)
 
-    def do_show_drop_probabilities(self, line):
+
+    def do_set_drop_probabilities(self, line):
+        ''' Set ingress and egress drop probabilities for simulated drops.
+            Usage: set_drop_probabilities <ingress probability> <egress probability>
+        '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._set_drop_probabilities(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                # print('Switch name: {}'.format(sw))
+                self._set_drop_probabilities(line.strip())
+        if with_ctrls:
+            self.ctrl = None
+        
+    def _show_drop_probabilities(self, line):
         ''' Show ingress and egress drop probabilities for simulated drops '''
         if line:
             self.error('Unknown parameter: {}'.format(line))
@@ -353,7 +431,26 @@ class Cli(Cmd, object):
                 'Drop probabilities: Ingress: {:.2f}% Egress: {:.2f}%'.format(
                     ig_prob * 100, eg_prob * 100))
 
-    def do_show_dropped_packets(self, line):
+
+    def do_show_drop_probabilities(self, line):
+        ''' Show ingress and egress drop probabilities for simulated drops '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_drop_probabilities(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_drop_probabilities(line.strip())
+        if with_ctrls:
+            self.ctrl = None
+
+    def _show_dropped_packets(self, line):
         ''' Show the number of packets dropped by the drop simulator per-QP.
             If a queue pair number is provided, only the value for that queue pair
             will be shown.
@@ -389,6 +486,29 @@ class Cli(Cmd, object):
         for v in values:
             msg += format_string.format(**v)
         self.out(msg)
+
+
+    def do_show_dropped_packets(self, line):
+        ''' Show the number of packets dropped by the drop simulator per-QP.
+            If a queue pair number is provided, only the value for that queue pair
+            will be shown.
+        '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_dropped_packets(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_dropped_packets(line.strip())
+        if with_ctrls:
+            self.ctrl = None
+        
 
     def _show_workers(self, sender, receiver, line):
         ''' Show the number of sent and received packets/bytes per worker.
@@ -451,14 +571,35 @@ class Cli(Cmd, object):
                 msg += format_string.format(ID=id, **recvd[id])
         self.out(msg)
 
-    def do_show_rdma_workers(self, line):
+    def _show_rdma_workers(self, line):
         ''' Show the number of sent and received packets/bytes per RDMA worker.
             If a worker ID is provided, only the value for that worker
             will be shown.
         '''
         self._show_workers(self.ctrl.rdma_sender, self.ctrl.rdma_receiver, line)
 
-    def do_show_queue_pairs_counters(self, line):
+    def do_show_rdma_workers(self, line):
+        ''' Show the number of sent and received packets/bytes per RDMA worker.
+            If a worker ID is provided, only the value for that worker
+            will be shown.
+        '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_rdma_workers(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_rdma_workers(line.strip())
+        if with_ctrls:
+            self.ctrl = None
+
+    def _show_queue_pairs_counters(self, line):
         ''' Show the number of packets and messages received per queue pair.
             If one integer argument N is provided, it will show only the first
             N queue pairs per worker. If two integer arguments S and N are
@@ -515,12 +656,57 @@ class Cli(Cmd, object):
             msg += format_string.format(**v)
         self.out(msg)
 
-    def do_show_udp_workers(self, line):
+
+    def do_show_queue_pairs_counters(self, line):
+        ''' Show the number of packets and messages received per queue pair.
+            If one integer argument N is provided, it will show only the first
+            N queue pairs per worker. If two integer arguments S and N are
+            provided, it will show only the elements with indices [S, S+N]
+            per worker.
+        '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_queue_pairs_counters(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_queue_pairs_counters(line.strip())
+        if with_ctrls:
+            self.ctrl = None
+        
+    def _show_udp_workers(self, line):
         ''' Show the number of sent and received packets/bytes per UDP worker.
             If a worker ID is provided, only the value for that worker
             will be shown.
         '''
         self._show_workers(self.ctrl.udp_sender, self.ctrl.udp_receiver, line)
+
+    def do_show_udp_workers(self, line):
+        ''' Show the number of sent and received packets/bytes per UDP worker.
+            If a worker ID is provided, only the value for that worker
+            will be shown.
+        '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_udp_workers(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_udp_workers(line.strip())
+        if with_ctrls:
+            self.ctrl = None
 
     
     def do_set_mgid_offset_factor(self,line):
@@ -637,7 +823,7 @@ class Cli(Cmd, object):
         self.ctrl.udp_sender.set_udp_port_for_worker_for_pipe(0xffff,int(arg.split()[3]),pipe=pipe_num)
         
 
-    def do_show_bitmap(self, line):
+    def _show_bitmap(self, line):
         ''' Show the current bitmap values per slot index. The default is
             to show only the first 8 values.
             If one integer argument N is provided, it will show the first
@@ -710,7 +896,32 @@ class Cli(Cmd, object):
             msg += format_string.format(**v)
         self.out(msg)
 
-    def do_show_statistics(self, line):
+
+    def do_show_bitmap(self, line):
+        ''' Show the current bitmap values per slot index. The default is
+            to show only the first 8 values.
+            If one integer argument N is provided, it will show the first
+            N elements. If two integer arguments S and N are
+            provided, it will show the elements with indices [S, S+N].
+        '''
+
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_bitmap(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_bitmap(line.strip())
+        if with_ctrls:
+            self.ctrl = None
+
+    def _show_statistics(self, line):
         ''' Show the number of SwitchML packets broadcasted, recirculated
             retransmitted, and dropped per slot index.
             The default is to show only the first 8 values.
@@ -786,3 +997,29 @@ class Cli(Cmd, object):
         for v in values:
             msg += format_string.format(**v)
         self.out(msg)
+
+
+    def do_show_statistics(self, line):
+        ''' Show the number of SwitchML packets broadcasted, recirculated
+            retransmitted, and dropped per slot index.
+            The default is to show only the first 8 values.
+            If one integer argument N is provided, it will show the first
+            N elements. If two integer arguments S and N are
+            provided, it will show the elements with indices [S, S+N].
+        '''
+        with_ctrls = (self.ctrls is not None)
+        if with_ctrls:
+            if line:
+                if line.split()[-1].strip() in self.ctrls.keys():
+                    self.ctrl = self.ctrls[line.split()[-1].strip()]
+                    line = " ".join(line.split()[:-1])
+        if self.ctrl:
+            self._show_statistics(line.strip())
+        else:
+            for sw in self.ctrls.keys():
+                self.ctrl = self.ctrls[sw]
+                print('Switch name: {}'.format(sw))
+                self._show_statistics(line.strip())
+        if with_ctrls:
+            self.ctrl = None
+        

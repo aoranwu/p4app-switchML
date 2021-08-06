@@ -1,0 +1,15 @@
+sw1:
+    bfrt_ip: "127.0.0.1"
+    bfrt_port: 50052
+    switch_mac: '06:00:00:00:00:01'
+    switch_ip: '198.19.200.201'
+    ports_file: '/home/aoranwu/p4app-switchML/dev_root/controller/ports_mp.yaml'
+    use_model: 1
+    use_multipipe: 1
+    switch_conf_file: "/home/aoranwu/p4app-switchML/dev_root/controller/switch_conf_mp.yaml"
+
+    # is_root_switch: 1
+    # lower_layer_switches: [{rank: "0",mac_address: "06:00:00:00:00:02",ip_address: "198.19.200.202", udp_port: 48864},
+    #                        {rank: "1",mac_address: "06:00:00:00:00:03",ip_address: "198.19.200.203", udp_port: 48864}]
+  
+

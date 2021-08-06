@@ -34,6 +34,9 @@ class RDMAReceiver(Control):
         self.switch_mac = None
         self.switch_ip = None
 
+        self.switch_macs = ["","","",""]
+        self.switch_ips = ["","","",""] 
+
         # Annotations
         self.table.info.key_field_annotation_add('hdr.ipv4.dst_addr', 'ipv4')
         self.table.info.key_field_annotation_add('hdr.ipv4.src_addr', 'ipv4')
@@ -61,6 +64,11 @@ class RDMAReceiver(Control):
         ''' Set switch MAC and IP '''
         self.switch_mac = switch_mac
         self.switch_ip = switch_ip
+
+    def set_switch_mac_and_ips(self, switch_macs, switch_ips):
+        ''' Set switch MAC and IP '''
+        self.switch_macs = switch_macs
+        self.switch_ips = switch_ips
 
     def reset_counters(self):
         ''' Reset RDMA counters '''

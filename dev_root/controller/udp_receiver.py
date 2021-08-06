@@ -35,8 +35,8 @@ class UDPReceiver(Control):
         self.switch_mac = None
         self.switch_ip = None
 
-        self.switch_macs = ["06:00:00:00:00:02","06:00:00:00:00:03","06:00:00:00:00:01"]
-        self.switch_ips = ["198.19.200.202","198.19.200.203","198.19.200.201"] 
+        self.switch_macs = ["","","",""]
+        self.switch_ips = ["","","",""] 
 
         # Annotations
         self.table.info.key_field_annotation_add('hdr.ethernet.dst_addr', 'mac')
@@ -55,6 +55,11 @@ class UDPReceiver(Control):
         ''' Set switch MAC and IP '''
         self.switch_mac = switch_mac
         self.switch_ip = switch_ip
+    
+    def set_switch_mac_and_ips(self, switch_macs, switch_ips):
+        ''' Set switch MACs and IPs for multipipe '''
+        self.switch_macs = switch_macs
+        self.switch_ips = switch_ips
 
     def reset_counters(self):
         ''' Reset UDP counters '''
@@ -180,7 +185,7 @@ class UDPReceiver(Control):
             self.log.error(error_msg)
             return (False, error_msg)
 
-        if self.switch_mac == None or self.switch_ip == None:
+        if self.switch_macs == None or self.switch_ips == None:
             error_msg = 'No switch address'
             self.log.error(error_msg)
             return (False, error_msg)

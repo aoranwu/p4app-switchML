@@ -75,8 +75,8 @@ class SwitchML(object):
         # Multicast group ID -> replication ID (= node ID) -> port
         self.multicast_groups = {self.all_ports_mgid: {}}
 
-        self.switch_macs = ["06:00:00:00:00:02","06:00:00:00:00:03","06:00:00:00:00:01"]
-        self.switch_ips = ["198.19.200.202","198.19.200.203","198.19.200.201"] 
+        self.switch_macs = ["","","",""]
+        self.switch_ips = ["","","",""] 
 
     def critical_error(self, msg):
         self.log.critical(msg)
@@ -210,13 +210,13 @@ class SwitchML(object):
             if not success:
                 self.critical_error(ports)
 
-            # Set switch addresses
-            self.set_switch_mac_and_ip(switch_mac, switch_ip, self.use_multipipe)
+            
 
             
 
-
-                
+            if not use_multipipe:
+                # Set switch addresses
+                self.set_switch_mac_and_ip(switch_mac, switch_ip, self.use_multipipe)      
 
 
             # CLI setup
@@ -253,9 +253,17 @@ class SwitchML(object):
                         pipe_confs = yaml.safe_load(f)
                         for pipe_conf in pipe_confs.values():
                             pipe_num = pipe_conf['pipe_num']
+                            self.switch_macs[pipe_num] = pipe_conf['pipe_mac_address']
+                            self.switch_ips[pipe_num] = pipe_conf['pipe_ip_address']
+                        
+                        # Set switch addresses
+                        self.set_switch_mac_and_ip(switch_mac, switch_ip, self.use_multipipe) 
+
+                        for pipe_conf in pipe_confs.values():
+                            pipe_num = pipe_conf['pipe_num']
                             mgid_offset_factor = pipe_conf['mgid_offset_factor']
-                            is_root_switch = pipe_conf['is_root_switch']
-                            self.cli.do_set_mgid_offset_factor_for_pipe(" ".join([str(pipe_num),str(pipe_num)]))
+                            is_root_switch = pipe_conf['is_root_switch']  
+                            self.cli.do_set_mgid_offset_factor_for_pipe(" ".join([str(mgid_offset_factor),str(pipe_num)]))
                             if is_root_switch:
                                 self.cli.do_set_root_switch_for_pipe(str(pipe_num))
                                 self.lower_layer_pipes = pipe_conf["lower_layer_switches"]
@@ -276,7 +284,8 @@ class SwitchML(object):
                                     worker['ip_address'],str(worker['udp_port']),str(pipe_num)])
                                     self.cli.do_worker_add_udp_for_pipe(line)
 
-                            
+            # # Set switch addresses
+            # self.set_switch_mac_and_ip(switch_mac, switch_ip, self.use_multipipe)                
 
                         
 
@@ -395,17 +404,24 @@ class SwitchML(object):
         ''' Set switch MAC and IP '''
         self.switch_mac = switch_mac.upper()
         self.switch_ip = switch_ip
-
-        self.arp_and_icmp.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
-        self.rdma_receiver.set_switch_mac_and_ip(self.switch_mac,
-                                                 self.switch_ip)
-        self.udp_receiver.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
-        self.rdma_sender.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
         if not use_mps:
+            self.arp_and_icmp.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
+            self.rdma_receiver.set_switch_mac_and_ip(self.switch_mac,
+                                                    self.switch_ip)
+            self.udp_receiver.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
+            self.rdma_sender.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
             self.udp_sender.set_switch_mac_and_ip(self.switch_mac, self.switch_ip)
         else:
+            self.arp_and_icmp.set_switch_mac_and_ip(self.switch_macs[0], self.switch_ips[0])
+            self.rdma_receiver.set_switch_mac_and_ips(self.switch_macs,
+                                                    self.switch_ips)
+            self.udp_receiver.set_switch_mac_and_ips(self.switch_macs, self.switch_ips)
             for i in range(3):
                 self.udp_sender.set_switch_mac_and_ip_for_pipe(self.switch_macs[i], self.switch_ips[i], i)
+                self.rdma_sender.set_switch_mac_and_ip_for_pipe(self.switch_macs[i], self.switch_ips[i], i)
+        
+            
+
 
 
     def get_switch_mac_and_ip(self):

@@ -128,8 +128,8 @@ class BasicReduction(TwoWorkerTest):
 
         # Ether(self.expected_pktW0S0).show()
         send_packet(self, 2, self.pktW1S0)
-        verify_packet(self, self.expected_pktW0S0, 1)
-        verify_packet(self, self.expected_pktW1S0, 2)
+        verify_packet(self, self.expected_pktW0S0, 1, timeout=5)
+        verify_packet(self, self.expected_pktW1S0, 2, timeout=5)
 
 class RetransmitAfterReduction(TwoWorkerTest):
     """

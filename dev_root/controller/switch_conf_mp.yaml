@@ -1,5 +1,7 @@
 p2:
     pipe_num: 2
+    pipe_ip_address: "198.19.200.201"
+    pipe_mac_address: "06:00:00:00:00:01"
     mgid_offset_factor: 2
     is_root_switch: 1
     lower_layer_switches: [{rank: "0",mac_address: "06:00:00:00:00:02",ip_address: "198.19.200.202", udp_port: 48864},
@@ -7,6 +9,8 @@ p2:
   
 p0:
     pipe_num: 0
+    pipe_ip_address: "198.19.200.202"
+    pipe_mac_address: "06:00:00:00:00:02"
     mgid_offset_factor: 0
     is_root_switch: 0
     upward_port: 60
@@ -18,6 +22,8 @@ p0:
 
 p1:
     pipe_num: 1
+    pipe_ip_address: "198.19.200.203"
+    pipe_mac_address: "06:00:00:00:00:03"
     mgid_offset_factor: 1
     is_root_switch: 0
     upward_port: 188

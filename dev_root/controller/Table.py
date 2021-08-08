@@ -23,6 +23,11 @@ class Table(object):
 
         # lowest possible  priority for ternary match rules
         self.lowest_priority = 1 << 24
+
+        # targets for each pipe
+        self.targets = []
+        for i in range(4):
+            self.targets.append(gc.Target(device_id=0,pipe_id=i))
         
 
     def clear(self):

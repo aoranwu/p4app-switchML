@@ -1,0 +1,20 @@
+{
+    "PortToVeth": [
+        {
+            "device_port":0,
+            "veth1":65,
+            "veth2":64
+        },
+        {
+            "device_port":4,
+            "veth1":67,
+            "veth2":66
+        },
+        {
+            "_comment": "Map ethernet CPU port 64 to veth250",
+            "device_port":64,
+            "veth1":250,
+            "veth2":251
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+# p2:
+#     pipe_num: 2
+#     pipe_ip_address: "198.19.200.201"
+#     pipe_mac_address: "06:00:00:00:00:01"
+#     mgid_offset_factor: 2
+#     is_root_switch: 1
+#     lower_layer_switches: [{rank: "0",mac_address: "06:00:00:00:00:02",ip_address: "198.19.200.202", udp_port: 48864},
+#                            {rank: "1",mac_address: "06:00:00:00:00:03",ip_address: "198.19.200.203", udp_port: 48864}]
+  
+p0:
+    pipe_num: 0
+    pipe_ip_address: "198.19.200.202"
+    pipe_mac_address: "06:00:00:00:00:02"
+    mgid_offset_factor: 0
+    is_root_switch: 0
+    upward_port: 60
+    upward_switch_mac: "06:00:00:00:00:01"
+    upward_switch_ip: "198.19.200.201"
+    upward_udp_port: 48864
+    workers: [{rank: "2",mac_address: "de:08:be:d7:01:47",ip_address: "198.19.200.50", udp_port: 12345},
+              {rank: "3",mac_address: "62:68:1b:cb:18:05",ip_address: "198.19.200.49", udp_port: 12345}]
+
+p2:
+    pipe_num: 2
+    pipe_ip_address: "198.19.200.203"
+    pipe_mac_address: "06:00:00:00:00:03"
+    mgid_offset_factor: 2
+    is_root_switch: 0
+    upward_port: 316
+    upward_switch_mac: "06:00:00:00:00:01"
+    upward_switch_ip: "198.19.200.201"
+    upward_udp_port: 48864
+    workers: [{rank: "4",mac_address: "86:bd:7b:5c:b9:2b",ip_address: "198.19.200.48", udp_port: 12345},
+              {rank: "5",mac_address: "7e:0a:ae:fb:53:df",ip_address: "198.19.200.47", udp_port: 12345}]
+

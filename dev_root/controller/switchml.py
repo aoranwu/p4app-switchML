@@ -75,8 +75,8 @@ class SwitchML(object):
         # Multicast group ID -> replication ID (= node ID) -> port
         self.multicast_groups = {self.all_ports_mgid: {}}
 
-        self.switch_macs = ["","","",""]
-        self.switch_ips = ["","","",""] 
+        self.switch_macs = ["00:00:00:00:00:00","00:00:00:00:00:00","00:00:00:00:00:00","00:00:00:00:00:00"]
+        self.switch_ips = ["0.0.0.0","0.0.0.0","0.0.0.0","0.0.0.0"] 
 
     def critical_error(self, msg):
         self.log.critical(msg)
@@ -416,7 +416,7 @@ class SwitchML(object):
             self.rdma_receiver.set_switch_mac_and_ips(self.switch_macs,
                                                     self.switch_ips)
             self.udp_receiver.set_switch_mac_and_ips(self.switch_macs, self.switch_ips)
-            for i in range(3):
+            for i in range(4):
                 self.udp_sender.set_switch_mac_and_ip_for_pipe(self.switch_macs[i], self.switch_ips[i], i)
                 self.rdma_sender.set_switch_mac_and_ip_for_pipe(self.switch_macs[i], self.switch_ips[i], i)
         

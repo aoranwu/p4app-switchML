@@ -1,41 +1,44 @@
-15:18:22 - INFO - SwitchML controller
-15:18:22 - INFO - Subscribe attempt #1
-15:18:22 - INFO - Subscribe response received 0
-15:18:22 - INFO - Connected to BFRT server 192.168.1.2:50052
-15:18:22 - INFO - Binding with p4_name switchml
-15:18:22 - INFO - Binding with p4_name switchml successful!!
-15:18:22 - INFO - Received switchml on GetForwarding on client 0, device 0
-15:18:36 - INFO - 49 front panel ports set in loopback mode
-15:18:36 - INFO - CPU port: 320
-15:18:43 - INFO - Setting up get_port_from_worker_id table...
-15:19:18 - INFO - Setting up set_switch_type table...
-15:19:18 - INFO - Setting up SetMgidOffsetFactor table...
-15:19:18 - INFO - Added port: 1/0 100G none disable
-15:19:19 - INFO - Added port: 1/1 100G none disable
-15:19:19 - INFO - Added UDP worker 0:06:00:00:00:00:02 198.19.200.202
-15:19:19 - INFO - Added UDP worker 1:06:00:00:00:00:03 198.19.200.203
-15:19:19 - INFO - gRPC server started
-15:19:19 - INFO - gRPC server stopped
-15:19:19 - INFO - Stopping controller
-15:19:19 - INFO - SwitchML controller
-15:19:19 - INFO - Subscribe attempt #1
-15:19:19 - INFO - Subscribe response received 0
-15:19:19 - INFO - Connected to BFRT server 192.168.2.2:50052
-15:19:19 - INFO - Binding with p4_name switchml
-15:19:19 - INFO - Binding with p4_name switchml successful!!
-15:19:19 - INFO - Received switchml on GetForwarding on client 0, device 0
-15:19:33 - INFO - 49 front panel ports set in loopback mode
-15:19:33 - INFO - CPU port: 320
-15:19:39 - INFO - Setting up get_port_from_worker_id table...
-15:20:16 - INFO - Setting up set_switch_type table...
-15:20:16 - INFO - Setting up SetMgidOffsetFactor table...
-15:20:16 - INFO - Added port: 1/0 100G none disable
-15:20:16 - INFO - Added port: 1/1 100G none disable
-15:20:16 - INFO - Added port: 1/2 100G none disable
-15:20:16 - INFO - Added UDP worker 0:ca:0c:b1:05:46:77 198.19.200.50
-15:20:16 - INFO - Added UDP worker 1:02:ec:cd:ec:30:c2 198.19.200.49
-15:20:16 - INFO - gRPC server started
-15:20:16 - ERROR - Event loop is closed
+19:57:05 - INFO - SwitchML controller
+19:57:05 - INFO - Subscribe attempt #1
+19:57:05 - INFO - Subscribe response received 0
+19:57:05 - INFO - Connected to BFRT server 192.168.1.2:50052
+19:57:05 - INFO - Binding with p4_name switchml
+19:57:05 - INFO - Binding with p4_name switchml successful!!
+19:57:05 - INFO - Received switchml on GetForwarding on client 0, device 0
+19:57:19 - INFO - 49 front panel ports set in loopback mode
+19:57:19 - INFO - CPU port: 320
+19:57:25 - INFO - Setting up get_port_from_worker_id table...
+19:57:57 - INFO - Setting up set_switch_type table...
+19:57:57 - INFO - Setting up SetMgidOffsetFactor table...
+19:57:57 - INFO - Added port: 1/0 100G none disable
+19:57:57 - INFO - Added port: 2/0 100G none disable
+19:57:57 - INFO - Added port: 33/0 100G none disable
+19:57:57 - INFO - Added port: 34/0 100G none disable
+19:57:57 - INFO - Added UDP worker 2:de:08:be:d7:01:47 198.19.200.50
+19:57:57 - INFO - Added UDP worker 3:62:68:1b:cb:18:05 198.19.200.49
+19:57:57 - INFO - Added UDP worker 4:86:bd:7b:5c:b9:2b 198.19.200.48
+19:57:57 - INFO - Added UDP worker 5:7e:0a:ae:fb:53:df 198.19.200.47
+19:57:57 - INFO - gRPC server started
+19:57:57 - INFO - gRPC server stopped
+19:57:57 - INFO - Stopping controller
+19:57:57 - INFO - SwitchML controller
+19:57:57 - INFO - Subscribe attempt #1
+19:57:57 - INFO - Subscribe response received 0
+19:57:57 - INFO - Connected to BFRT server 192.168.2.2:50052
+19:57:57 - INFO - Binding with p4_name switchml
+19:57:57 - INFO - Binding with p4_name switchml successful!!
+19:57:57 - INFO - Received switchml on GetForwarding on client 0, device 0
+19:58:11 - INFO - 49 front panel ports set in loopback mode
+19:58:11 - INFO - CPU port: 320
+19:58:17 - INFO - Setting up get_port_from_worker_id table...
+19:58:49 - INFO - Setting up set_switch_type table...
+19:58:49 - INFO - Setting up SetMgidOffsetFactor table...
+19:58:49 - INFO - Added port: 1/0 100G none disable
+19:58:49 - INFO - Added port: 2/0 100G none disable
+19:58:49 - INFO - Added UDP worker 0:06:00:00:00:00:02 198.19.200.202
+19:58:49 - INFO - Added UDP worker 1:06:00:00:00:00:03 198.19.200.203
+19:58:49 - INFO - gRPC server started
+19:58:49 - ERROR - Event loop is closed
 Traceback (most recent call last):
   File "/home/aoranwu/p4app-switchML/dev_root/controller/switchml.py", line 716, in run
     self.event_loop.call_soon_threadsafe(self.grpc_server.stop)
@@ -44,32 +47,4 @@ Traceback (most recent call last):
   File "/usr/lib/python3.6/asyncio/base_events.py", line 381, in _check_closed
     raise RuntimeError('Event loop is closed')
 RuntimeError: Event loop is closed
-15:20:16 - INFO - Stopping controller
-15:20:16 - INFO - SwitchML controller
-15:20:16 - INFO - Subscribe attempt #1
-15:20:16 - INFO - Subscribe response received 0
-15:20:16 - INFO - Connected to BFRT server 192.168.3.2:50052
-15:20:16 - INFO - Binding with p4_name switchml
-15:20:16 - INFO - Binding with p4_name switchml successful!!
-15:20:16 - INFO - Received switchml on GetForwarding on client 0, device 0
-15:20:30 - INFO - 49 front panel ports set in loopback mode
-15:20:30 - INFO - CPU port: 320
-15:20:37 - INFO - Setting up get_port_from_worker_id table...
-15:21:12 - INFO - Setting up set_switch_type table...
-15:21:12 - INFO - Setting up SetMgidOffsetFactor table...
-15:21:12 - INFO - Added port: 1/0 100G none disable
-15:21:13 - INFO - Added port: 1/1 100G none disable
-15:21:13 - INFO - Added port: 1/2 100G none disable
-15:21:13 - INFO - Added UDP worker 0:e6:5d:09:2e:a3:ac 198.19.200.48
-15:21:13 - INFO - Added UDP worker 1:9e:3e:ed:c0:b6:5c 198.19.200.47
-15:21:13 - INFO - gRPC server started
-15:21:13 - ERROR - Event loop is closed
-Traceback (most recent call last):
-  File "/home/aoranwu/p4app-switchML/dev_root/controller/switchml.py", line 716, in run
-    self.event_loop.call_soon_threadsafe(self.grpc_server.stop)
-  File "/usr/lib/python3.6/asyncio/base_events.py", line 641, in call_soon_threadsafe
-    self._check_closed()
-  File "/usr/lib/python3.6/asyncio/base_events.py", line 381, in _check_closed
-    raise RuntimeError('Event loop is closed')
-RuntimeError: Event loop is closed
-15:21:13 - INFO - Stopping controller
+19:58:49 - INFO - Stopping controller

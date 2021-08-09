@@ -1,0 +1,40 @@
+{
+    "PortToVeth": [
+        {
+            "device_port":0,
+            "veth1":68,
+            "veth2":69
+        },
+        {
+            "device_port":4,
+            "veth1":70,
+            "veth2":71
+        },
+        {
+            "device_port":256,
+            "veth1":72,
+            "veth2":73
+        },
+        {
+            "device_port":260,
+            "veth1":74,
+            "veth2":75
+        },
+        {
+            "device_port":60,
+            "veth1":64,
+            "veth2":65
+        },
+        {
+            "device_port":316,
+            "veth1":66,
+            "veth2":67
+        },
+        {
+            "_comment": "Map ethernet CPU port 64 to veth250",
+            "device_port":64,
+            "veth1":250,
+            "veth2":251
+        }
+    ]
+}

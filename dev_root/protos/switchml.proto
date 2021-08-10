@@ -64,6 +64,7 @@ message UdpSessionRequest {
   uint64 mac = 4;
   uint32 ipv4 = 5;
   PacketSize packet_size = 7;
+  uint32 udp_port = 8;
 }
 
 message UdpSessionResponse {

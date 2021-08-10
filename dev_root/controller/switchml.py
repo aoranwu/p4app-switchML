@@ -176,7 +176,7 @@ class SwitchML(object):
             # RDMA receiver
             self.rdma_receiver = RDMAReceiver(self.target, gc, self.bfrt_info)
             # UDP receiver
-            self.udp_receiver = UDPReceiver(self.target, gc, self.bfrt_info)
+            self.udp_receiver = UDPReceiver(self.target, gc, self.bfrt_info, self)
             # Bitmap checker
             self.bitmap_checker = BitmapChecker(self.target, gc, self.bfrt_info)
             # Workers counter
@@ -197,7 +197,7 @@ class SwitchML(object):
             # RDMA sender
             self.rdma_sender = RDMASender(self.target, gc, self.bfrt_info)
             # UDP sender
-            self.udp_sender = UDPSender(self.target, gc, self.bfrt_info)
+            self.udp_sender = UDPSender(self.target, gc, self.bfrt_info, self)
 
             self.set_switch_type = SetSwitchType(gc, self.bfrt_info)
             self.set_mgid_offset_factor = SetMgidOffsetFactor(gc, self.bfrt_info)
@@ -209,10 +209,6 @@ class SwitchML(object):
             success, ports = self.load_ports_file(ports_file)
             if not success:
                 self.critical_error(ports)
-
-            
-
-            
 
             if not use_multipipe:
                 # Set switch addresses
@@ -424,9 +420,12 @@ class SwitchML(object):
 
 
 
-    def get_switch_mac_and_ip(self):
+    def get_switch_mac_and_ip(self, pipe=0):
         ''' Get switch MAC and IP '''
-        return self.switch_mac, self.switch_ip
+        if not self.use_multipipe:
+            return self.switch_mac, self.switch_ip
+        else:
+            return self.switch_macs[pipe], self.switch_ips[pipe]
 
     def clear_multicast_group(self, session_id):
         ''' Remove multicast group and nodes for this session '''
@@ -705,7 +704,7 @@ class SwitchML(object):
         try:
             # Start listening for RPCs
             self.grpc_future = self.grpc_executor.submit(
-                self.grpc_server.run, self.event_loop, self)
+                self.grpc_server.run, self.event_loop, self, None)
 
             self.log.info('gRPC server started')
 

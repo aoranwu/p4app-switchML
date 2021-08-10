@@ -79,10 +79,43 @@ if __name__ == '__main__':
                 args.bfrt_port, args.ports, args.use_multipipe, args.use_model, args.switch_name, args.switch_conf_file)
         ctrls[sw_name] = ctrl
         # Start controller
-        ctrl.run()
+        # ctrl.run()
     cli = Cli()
     cli.setup(ctrls, None, prompt='SwitchML', name='SwitchML controller')
-    cli.run()
+    
+
+    # Set up gRPC server
+    grpc_server = GRPCServer(ip='[::]', port=50099)
+
+    # Run event loop for gRPC server in a separate thread
+    # limit concurrency to 1 to avoid synchronization problems in the BFRT interface
+    grpc_executor = futures.ThreadPoolExecutor(max_workers=1)
+
+    event_loop = asyncio.get_event_loop()
+
+    try:
+        # Start listening for RPCs
+        grpc_future = grpc_executor.submit(
+            grpc_server.run, event_loop, None, ctrls)
+
+        cli.run()
+
+        # Stop gRPC server and event loop
+        event_loop.call_soon_threadsafe(grpc_server.stop)
+
+        # Wait for gRPC thread to end
+        grpc_future.result()
+
+        # Stop event loop
+        event_loop.close()
+
+        # Close gRPC executor
+        grpc_executor.shutdown()
+
+    except Exception as e:
+        pass
+
+        
 
     # Flush log, stdout, stderr
     sys.stdout.flush()

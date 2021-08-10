@@ -19,7 +19,7 @@ from control import Control
 
 class UDPSender(Control):
 
-    def __init__(self, target, gc, bfrt_info):
+    def __init__(self, target, gc, bfrt_info, ctrl=None):
         # Set up base class
         super(UDPSender, self).__init__(target, gc)
 
@@ -30,6 +30,7 @@ class UDPSender(Control):
             bfrt_info.table_get('pipe.Egress.udp_sender.dst_addr'),
             bfrt_info.table_get('pipe.Egress.udp_sender.set_dst_udp_port_tbl')
         ]
+        self.ctrl = ctrl
 
         self.switch_mac_and_ip = self.tables[0]
         self.dst_addr = self.tables[1]
@@ -168,25 +169,56 @@ class UDPSender(Control):
             worker, otherwise it will return all of them.
         '''
 
-        self.dst_addr.operations_execute(self.target, 'SyncCounters')
-        resp = self.dst_addr.entry_get(self.target, flags={'from_hw': False})
 
-        values = {}
-        for v, k in resp:
-            v = v.to_dict()
-            k = k.to_dict()
+        
+        if not self.ctrl.use_multipipe:
+            self.dst_addr.operations_execute(self.target, 'SyncCounters')
+            resp = self.dst_addr.entry_get(self.target, flags={'from_hw': False})
+            pipe_num = 0xffff
+            values = {}
+            for v, k in resp:
+                v = v.to_dict()
+                k = k.to_dict()
+                pipe = pipe_num
+                id = k['eg_md.switchml_md.worker_id']['value']
+                mac = v['eth_dst_addr']
+                ip = v['ip_dst_addr']
+                packets = v['$COUNTER_SPEC_PKTS']
+                bytes = v['$COUNTER_SPEC_BYTES']
 
-            id = k['eg_md.switchml_md.worker_id']['value']
-            mac = v['eth_dst_addr']
-            ip = v['ip_dst_addr']
-            packets = v['$COUNTER_SPEC_PKTS']
-            bytes = v['$COUNTER_SPEC_BYTES']
-
-            if worker_id == None or worker_id == id:
-                values[id] = {
-                    'MAC': mac,
-                    'IP': ip,
-                    'spkts': packets,
-                    'sbytes': bytes
-                }
+                if worker_id == None or worker_id == id:
+                    values[id] = {
+                        'Pipe': pipe,
+                        'MAC': mac,
+                        'IP': ip,
+                        'spkts': packets,
+                        'sbytes': bytes
+                    }
+        else:
+            self.dst_addr.attribute_entry_scope_set(self.target, predefined_pipe_scope=True,
+                                                            predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
+            values = {}
+            for pipe_num in range(4):
+                self.dst_addr.operations_execute(self.targets[pipe_num], 'SyncCounters')
+                resp = self.dst_addr.entry_get(self.targets[pipe_num], flags={'from_hw': False})
+                for v, k in resp:
+                    v = v.to_dict()
+                    k = k.to_dict()
+                    
+                    pipe = pipe_num
+                    id = k['eg_md.switchml_md.worker_id']['value']
+                    mac = v['eth_dst_addr']
+                    ip = v['ip_dst_addr']
+                    packets = v['$COUNTER_SPEC_PKTS']
+                    bytes = v['$COUNTER_SPEC_BYTES']
+                    
+                    if worker_id == None or worker_id == id:
+                        values[id] = {
+                            'Pipe': pipe,
+                            'MAC': mac,
+                            'IP': ip,
+                            'spkts': packets,
+                            'sbytes': bytes
+                        }
+        
         return values

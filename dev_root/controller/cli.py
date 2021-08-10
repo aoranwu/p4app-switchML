@@ -533,6 +533,8 @@ class Cli(Cmd, object):
             self.out('No matching workers')
             return
         elif (sent and not recvd) or (not sent and recvd):
+            print(sent)
+            print(recvd)
             self.log.error('Sender and Receiver entries mismatch')
             self.error('Unexpected error. See log for details')
             return
@@ -549,12 +551,12 @@ class Cli(Cmd, object):
                 recvd[id].update(sent[id])
 
         ids = sorted(recvd.keys())
-
         header1_format_string = ' {:^44} {:^19} {:^19}\n'
         format_string = (
-            ' {ID:^10} {MAC:^17} {IP:^15} {rpkts:^10}/{rbytes:^13} {spkts:^10}/{sbytes:^13}\n'
+            ' {ID:^10} {Pipe:^10} {MAC:^17} {IP:^15} {rpkts:^10}/{rbytes:^13} {spkts:^10}/{sbytes:^13}\n'
         )
         header2 = {
+            'Pipe': 'Pipe Num',
             'ID': 'Worker ID',
             'MAC': 'Worker MAC',
             'IP': 'Worker IP',

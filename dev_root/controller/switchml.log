@@ -1,50 +1,36 @@
-19:57:05 - INFO - SwitchML controller
-19:57:05 - INFO - Subscribe attempt #1
-19:57:05 - INFO - Subscribe response received 0
-19:57:05 - INFO - Connected to BFRT server 192.168.1.2:50052
-19:57:05 - INFO - Binding with p4_name switchml
-19:57:05 - INFO - Binding with p4_name switchml successful!!
-19:57:05 - INFO - Received switchml on GetForwarding on client 0, device 0
-19:57:19 - INFO - 49 front panel ports set in loopback mode
-19:57:19 - INFO - CPU port: 320
-19:57:25 - INFO - Setting up get_port_from_worker_id table...
-19:57:57 - INFO - Setting up set_switch_type table...
-19:57:57 - INFO - Setting up SetMgidOffsetFactor table...
-19:57:57 - INFO - Added port: 1/0 100G none disable
-19:57:57 - INFO - Added port: 2/0 100G none disable
-19:57:57 - INFO - Added port: 33/0 100G none disable
-19:57:57 - INFO - Added port: 34/0 100G none disable
-19:57:57 - INFO - Added UDP worker 2:de:08:be:d7:01:47 198.19.200.50
-19:57:57 - INFO - Added UDP worker 3:62:68:1b:cb:18:05 198.19.200.49
-19:57:57 - INFO - Added UDP worker 4:86:bd:7b:5c:b9:2b 198.19.200.48
-19:57:57 - INFO - Added UDP worker 5:7e:0a:ae:fb:53:df 198.19.200.47
-19:57:57 - INFO - gRPC server started
-19:57:57 - INFO - gRPC server stopped
-19:57:57 - INFO - Stopping controller
-19:57:57 - INFO - SwitchML controller
-19:57:57 - INFO - Subscribe attempt #1
-19:57:57 - INFO - Subscribe response received 0
-19:57:57 - INFO - Connected to BFRT server 192.168.2.2:50052
-19:57:57 - INFO - Binding with p4_name switchml
-19:57:57 - INFO - Binding with p4_name switchml successful!!
-19:57:57 - INFO - Received switchml on GetForwarding on client 0, device 0
-19:58:11 - INFO - 49 front panel ports set in loopback mode
-19:58:11 - INFO - CPU port: 320
-19:58:17 - INFO - Setting up get_port_from_worker_id table...
-19:58:49 - INFO - Setting up set_switch_type table...
-19:58:49 - INFO - Setting up SetMgidOffsetFactor table...
-19:58:49 - INFO - Added port: 1/0 100G none disable
-19:58:49 - INFO - Added port: 2/0 100G none disable
-19:58:49 - INFO - Added UDP worker 0:06:00:00:00:00:02 198.19.200.202
-19:58:49 - INFO - Added UDP worker 1:06:00:00:00:00:03 198.19.200.203
-19:58:49 - INFO - gRPC server started
-19:58:49 - ERROR - Event loop is closed
-Traceback (most recent call last):
-  File "/home/aoranwu/p4app-switchML/dev_root/controller/switchml.py", line 716, in run
-    self.event_loop.call_soon_threadsafe(self.grpc_server.stop)
-  File "/usr/lib/python3.6/asyncio/base_events.py", line 641, in call_soon_threadsafe
-    self._check_closed()
-  File "/usr/lib/python3.6/asyncio/base_events.py", line 381, in _check_closed
-    raise RuntimeError('Event loop is closed')
-RuntimeError: Event loop is closed
-19:58:49 - INFO - Stopping controller
+16:47:51 - INFO - SwitchML controller
+16:47:51 - INFO - Subscribe attempt #1
+16:47:51 - INFO - Subscribe response received 0
+16:47:51 - INFO - Connected to BFRT server 192.168.1.2:50052
+16:47:51 - INFO - Binding with p4_name switchml
+16:47:51 - INFO - Binding with p4_name switchml successful!!
+16:47:51 - INFO - Received switchml on GetForwarding on client 0, device 0
+16:48:05 - INFO - 49 front panel ports set in loopback mode
+16:48:05 - INFO - CPU port: 320
+16:48:12 - INFO - Setting up get_port_from_worker_id table...
+16:48:46 - INFO - Setting up set_switch_type table...
+16:48:46 - INFO - Setting up SetMgidOffsetFactor table...
+16:48:47 - INFO - Added port: 1/0 100G none disable
+16:48:47 - INFO - Added port: 2/0 100G none disable
+16:48:47 - INFO - Added port: 33/0 100G none disable
+16:48:47 - INFO - Added port: 34/0 100G none disable
+16:48:47 - INFO - SwitchML controller
+16:48:47 - INFO - Subscribe attempt #1
+16:48:47 - INFO - Subscribe response received 0
+16:48:47 - INFO - Connected to BFRT server 192.168.2.2:50052
+16:48:47 - INFO - Binding with p4_name switchml
+16:48:47 - INFO - Binding with p4_name switchml successful!!
+16:48:47 - INFO - Received switchml on GetForwarding on client 0, device 0
+16:49:01 - INFO - 49 front panel ports set in loopback mode
+16:49:01 - INFO - CPU port: 320
+16:49:07 - INFO - Setting up get_port_from_worker_id table...
+16:49:40 - INFO - Setting up set_switch_type table...
+16:49:40 - INFO - Setting up SetMgidOffsetFactor table...
+16:49:41 - INFO - Added port: 1/0 100G none disable
+16:49:41 - INFO - Added port: 2/0 100G none disable
+16:49:41 - INFO - Added UDP worker 0:06:00:00:00:00:02 198.19.200.202
+16:49:41 - INFO - Added UDP worker 1:06:00:00:00:00:03 198.19.200.203
+16:50:20 - INFO - Added UDP worker 2:DE:08:BE:D7:01:47 198.19.200.50
+16:50:20 - INFO - Added UDP worker 3:62:68:1B:CB:18:05 198.19.200.49
+16:50:20 - INFO - Added UDP worker 4:86:BD:7B:5C:B9:2B 198.19.200.48
+16:50:20 - INFO - Added UDP worker 1:7E:0A:AE:FB:53:DF 198.19.200.47

@@ -39,7 +39,7 @@ class GRPCServer(switchml_pb2_grpc.SessionServicer,
         # Event to stop the server
         self._stopped = asyncio.Event()
 
-    async def _serve(self, controller):
+    async def _serve(self, controller, controllers):
         ''' Server task '''
 
         # Setup server
@@ -64,14 +64,16 @@ class GRPCServer(switchml_pb2_grpc.SessionServicer,
         # Controller
         self.ctrl = controller
 
+        self.ctrls = controllers
+
         # Start gRPC server
         await self._server.start()
 
-    def run(self, loop, controller):
+    def run(self, loop, controller=None, controllers=None):
         ''' Run the gRPC server '''
 
         # Submit gRPC server task
-        loop.create_task(self._serve(controller))
+        loop.create_task(self._serve(controller=controller, controllers=controllers))
 
         # Run event loop
         loop.run_until_complete(self._stopped.wait())
@@ -294,7 +296,7 @@ class GRPCServer(switchml_pb2_grpc.SessionServicer,
                                               request.num_workers, mac_str,
                                               ipv4_str, request.packet_size))
 
-        if not self.ctrl:
+        if not self.ctrl and not self.ctrls:
             # This is a test, return the received parameters
             return switchml_pb2.UdpSessionResponse(
                 session_id=request.session_id,
@@ -303,20 +305,60 @@ class GRPCServer(switchml_pb2_grpc.SessionServicer,
 
         if request.rank == 0:
             # This is the first message, clear out old workers state
-            self.ctrl.clear_udp_workers(request.session_id)
+            if not self.ctrl:
+                self.ctrl.clear_udp_workers(request.session_id)
+            else:
+                for ctrl in self.ctrls.values():
+                    if not ctrl.use_multipipe:
+                        ctrl.clear_udp_workers(request.session_id) 
+                    else:
+                        self.log.error("clear workers not implemented for multipipe yet")
+                                    
 
         # Add new worker
-        success, error_msg = self.ctrl.add_udp_worker(request.session_id,
-                                                      request.rank,
-                                                      request.num_workers,
-                                                      mac_str, ipv4_str)
+        if self.ctrl:
+            success, error_msg = self.ctrl.add_udp_worker(request.session_id,
+                                                        request.rank,
+                                                        request.num_workers,
+                                                        mac_str, ipv4_str, request.udp_port)
+        else:
+            ctrl = None
+            dev_port = -1
+            for ctrl_ in self.ctrls.values():
+                success, dev_port_ = ctrl_.forwarder.get_dev_port(mac_str)
+                if success:
+                    ctrl = ctrl_
+                    dev_port = dev_port_
+                    break
+            if ctrl:
+                if not ctrl.use_multipipe:
+                    success, error_msg = ctrl.add_udp_worker(request.session_id,
+                                                        request.rank,
+                                                        request.num_workers,
+                                                        mac_str, ipv4_str, request.udp_port)
+                else:
+                    pipe_num = dev_port//128
+                    success, error_msg = ctrl.add_udp_worker_for_pipe(request.session_id,
+                                                        request.rank,
+                                                        request.num_workers,
+                                                        mac_str, ipv4_str, request.udp_port, pipe_num)
+
+            
+
         if not success:
             self.log.error(error_msg)
             #TODO return error message
             return switchml_pb2.UdpSessionResponse(session_id=0, mac=0, ipv4=0)
 
         # Get switch addresses
-        switch_mac, switch_ipv4 = self.ctrl.get_switch_mac_and_ip()
+        if self.ctrl:
+            switch_mac, switch_ipv4 = self.ctrl.get_switch_mac_and_ip()
+        else:
+            if not ctrl.use_multipipe:
+                switch_mac, switch_ipv4 = ctrl.get_switch_mac_and_ip()
+            else:
+                switch_mac, switch_ipv4 = ctrl.get_switch_mac_and_ip(pipe_num)
+
         switch_mac = int(switch_mac.replace(':', ''), 16)
         switch_ipv4 = int(ipaddress.ip_address(switch_ipv4))
 

@@ -21,9 +21,10 @@ from common import WorkerType
 
 class UDPReceiver(Control):
 
-    def __init__(self, target, gc, bfrt_info):
+    def __init__(self, target, gc, bfrt_info, ctrl = None):
         # Set up base class
         super(UDPReceiver, self).__init__(target, gc)
+        self.ctrl = ctrl
 
         self.log = logging.getLogger(__name__)
 
@@ -243,26 +244,52 @@ class UDPReceiver(Control):
             If a worker ID is provided, it will return only the values for that
             worker, otherwise it will return all of them.
         '''
+        if not self.ctrl.use_multipipe:
+            self.table.operations_execute(self.target, 'SyncCounters')
+            resp = self.table.entry_get(self.target, flags={'from_hw': False})
+            pipe_num = 0xffff
+            values = {}
+            for v, k in resp:
+                v = v.to_dict()
+                k = k.to_dict()
+                pipe = pipe_num
+                mac = k['hdr.ethernet.src_addr']['value']
+                ip = k['hdr.ipv4.src_addr']['value']
+                id = v['worker_id']
+                packets = v['$COUNTER_SPEC_PKTS']
+                bytes = v['$COUNTER_SPEC_BYTES']
 
-        self.table.operations_execute(self.target, 'SyncCounters')
-        resp = self.table.entry_get(self.target, flags={'from_hw': False})
+                if worker_id == None or worker_id == id:
+                    values[id] = {
+                        'Pipe': pipe,
+                        'MAC': mac,
+                        'IP': ip,
+                        'rpkts': packets,
+                        'rbytes': bytes
+                    }
+        else:
+            self.table.attribute_entry_scope_set(self.target, predefined_pipe_scope=True,
+                                                            predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
+            values = {}
+            for pipe_num in range(4):
+                self.table.operations_execute(self.targets[pipe_num], 'SyncCounters')
+                resp = self.table.entry_get(self.targets[pipe_num], flags={'from_hw': False})
+                for v, k in resp:
+                    v = v.to_dict()
+                    k = k.to_dict()
+                    pipe = pipe_num
+                    mac = k['hdr.ethernet.src_addr']['value']
+                    ip = k['hdr.ipv4.src_addr']['value']
+                    id = v['worker_id']
+                    packets = v['$COUNTER_SPEC_PKTS']
+                    bytes = v['$COUNTER_SPEC_BYTES']
 
-        values = {}
-        for v, k in resp:
-            v = v.to_dict()
-            k = k.to_dict()
-
-            mac = k['hdr.ethernet.src_addr']['value']
-            ip = k['hdr.ipv4.src_addr']['value']
-            id = v['worker_id']
-            packets = v['$COUNTER_SPEC_PKTS']
-            bytes = v['$COUNTER_SPEC_BYTES']
-
-            if worker_id == None or worker_id == id:
-                values[id] = {
-                    'MAC': mac,
-                    'IP': ip,
-                    'rpkts': packets,
-                    'rbytes': bytes
-                }
+                    if worker_id == None or worker_id == id:
+                        values[id] = {
+                            'Pipe': pipe,
+                            'MAC': mac,
+                            'IP': ip,
+                            'rpkts': packets,
+                            'rbytes': bytes
+                        }
         return values

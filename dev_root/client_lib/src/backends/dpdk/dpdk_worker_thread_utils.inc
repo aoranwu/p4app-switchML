@@ -65,7 +65,8 @@ uint16_t PktId2PoolIndex(uint64_t pkt_id, uint32_t switch_pool_index_start,
  */
 __rte_always_inline 
 void BuildPacket(rte_mbuf* mbuf, JobId job_id, uint32_t pkt_id,
-                 uint16_t switch_pool_index, uint64_t packet_numel,
+                 uint16_t switch_pool_index, uint64_t packet_numel, 
+                 uint16_t original_worker_id,
                  DpdkBackend::E2eAddress switch_e2e_addr_be,
                  DpdkBackend::E2eAddress worker_thread_e2e_addr_be,
                  std::shared_ptr<PrePostProcessor> ppp) {
@@ -127,6 +128,7 @@ void BuildPacket(rte_mbuf* mbuf, JobId job_id, uint32_t pkt_id,
     switchml_pkt_hdr->switch_pool_index = rte_cpu_to_be_16(switch_pool_index);
     switchml_pkt_hdr->job_type_size = (1 << 4) + pkt_len_enum; // bit shift for host to network byte order
     switchml_pkt_hdr->short_job_id = job_id; // Select the 8 LSBs of the job id
+    switchml_pkt_hdr->original_worker_id = original_worker_id;
 
     // Preprocess the packet (Copying/quantizing is done here)
     DpdkBackend::DpdkPacketElement* entries_ptr = reinterpret_cast<DpdkBackend::DpdkPacketElement*>(switchml_pkt_hdr+1);
@@ -251,6 +253,7 @@ void ResendPacketCallback(struct rte_timer *timer, void *arg) {
     // Build packet
     BuildPacket(mbufs[0], args->job_id, args->pkt_id, args->switch_pool_index,
         args->dwt->config_.general_.packet_numel,
+        args->dwt->config_.general_.rank,
         args->dwt->backend_.GetSwitchE2eAddr(),
         args->dwt->worker_thread_e2e_addr_be_,
         args->ppp);

@@ -232,7 +232,7 @@ void DpdkWorkerThread::operator()() {
                 switch_pool_index_start, switch_pool_index_shift, max_outstanding_pkts);
 
             BuildPacket(mbuf, job_slice.job->id_, pkt_id, switch_pool_index, genconf.packet_numel,
-                        bk.GetSwitchE2eAddr(), this->worker_thread_e2e_addr_be_, this->ppp_);
+                        genconf.rank, bk.GetSwitchE2eAddr(), this->worker_thread_e2e_addr_be_, this->ppp_);
             pkt_id++;
 
 #ifdef TIMEOUTS

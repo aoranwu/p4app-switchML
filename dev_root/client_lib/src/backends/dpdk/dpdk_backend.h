@@ -81,6 +81,12 @@ class DpdkBackend : public switchml::Backend {
          * to have a shadow copy for switch retransmissions.
         */
         uint16_t switch_pool_index; 
+
+        /** 
+         * From which worker this packet is sent to the switch
+         * Used for hierarchical aggregation when using multiple switches/pipes
+        */
+        uint16_t original_worker_id; 
     }__attribute__((__packed__));
 
     /** A type representing a single element in the packet */

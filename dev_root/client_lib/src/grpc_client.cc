@@ -83,7 +83,8 @@ std::ostream& operator<<(std::ostream& s, const switchml_proto::RdmaSessionRespo
 std::ostream& operator<<(std::ostream& s, const switchml_proto::UdpSessionRequest& r) {
     s << "<UDPSessionRequest" << std::hex << " session_id=" << r.session_id()
       << " rank=" << r.rank() << " num_workers=" << r.num_workers() << " mac=0x"
-      << r.mac() << " ipv4=0x" << r.ipv4() << " packet_size=0x" << r.packet_size();
+      << r.mac() << " ipv4=0x" << r.ipv4() << " packet_size=0x" << r.packet_size() 
+      <<" udp_port=0x" << r.udp_port();
     return s << ">" << std::dec;
 }
 

@@ -101,7 +101,7 @@ void DpdkBackend::SetupSwitch() {
     request.set_num_workers(this->config_.general_.num_workers);
     request.set_mac(ChangeMacEndianness(this->worker_e2e_addr_be_.mac)); // Set MAC in little endian
     request.set_ipv4(rte_be_to_cpu_32(this->worker_e2e_addr_be_.ip)); // Set IP in little endian
-
+    request.set_udp_port(this->config_.backend_.dpdk.worker_port); // Set the UDP port the worker is using
     // Categorize the length of the packet
     uint8_t pkt_len_enum;
     if (this->config_.general_.packet_numel < 64) {

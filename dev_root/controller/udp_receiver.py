@@ -203,40 +203,43 @@ class UDPReceiver(Control):
 
         self.table.attribute_entry_scope_set(self.target, predefined_pipe_scope=True,
                                                             predefined_pipe_scope_val=bfruntime_pb2.Mode.SINGLE)
-        self.table.entry_add(
-            self.targets[pipe],
-            [
-                self.table.make_key([
-                    self.gc.KeyTuple('$MATCH_PRIORITY', match_priority),
-                    # Don't match on ingress port; accept packets from a particular
-                    # worker no matter which port it comes in on.
-                    self.gc.KeyTuple(
-                        'ig_intr_md.ingress_port',
-                        0x000,  # 9 bits
-                        0x000),
-                    # Match on Ethernet addrs, IPs and port
-                    self.gc.KeyTuple('hdr.ethernet.src_addr', worker_mac,
-                                     worker_mac_mask),
-                    self.gc.KeyTuple('hdr.ethernet.dst_addr', self.switch_macs[pipe],
-                                     'FF:FF:FF:FF:FF:FF'),
-                    self.gc.KeyTuple('hdr.ipv4.src_addr', worker_ip,
-                                     worker_ip_mask),
-                    self.gc.KeyTuple('hdr.ipv4.dst_addr', self.switch_ips[pipe],
-                                     '255.255.255.255'),
-                    self.gc.KeyTuple('hdr.udp.dst_port', udp_port, udp_mask),
-                    # Ignore parser errors
-                    self.gc.KeyTuple('ig_prsr_md.parser_err', 0x0000, 0x0000)
+        try:
+            self.table.entry_add(
+                self.targets[pipe],
+                [
+                    self.table.make_key([
+                        self.gc.KeyTuple('$MATCH_PRIORITY', match_priority),
+                        # Don't match on ingress port; accept packets from a particular
+                        # worker no matter which port it comes in on.
+                        self.gc.KeyTuple(
+                            'ig_intr_md.ingress_port',
+                            0x000,  # 9 bits
+                            0x000),
+                        # Match on Ethernet addrs, IPs and port
+                        self.gc.KeyTuple('hdr.ethernet.src_addr', worker_mac,
+                                        worker_mac_mask),
+                        self.gc.KeyTuple('hdr.ethernet.dst_addr', self.switch_macs[pipe],
+                                        'FF:FF:FF:FF:FF:FF'),
+                        self.gc.KeyTuple('hdr.ipv4.src_addr', worker_ip,
+                                        worker_ip_mask),
+                        self.gc.KeyTuple('hdr.ipv4.dst_addr', self.switch_ips[pipe],
+                                        '255.255.255.255'),
+                        self.gc.KeyTuple('hdr.udp.dst_port', udp_port, udp_mask),
+                        # Ignore parser errors
+                        self.gc.KeyTuple('ig_prsr_md.parser_err', 0x0000, 0x0000)
+                    ])
+                ],
+                [
+                    self.table.make_data([
+                        self.gc.DataTuple('mgid', session_mgid),
+                        self.gc.DataTuple('worker_type', WorkerType.SWITCHML_UDP),
+                        self.gc.DataTuple('worker_id', worker_id),
+                        self.gc.DataTuple('num_workers', num_workers),
+                        self.gc.DataTuple('worker_bitmap', worker_mask)
+                    ], 'Ingress.udp_receiver.set_bitmap')
                 ])
-            ],
-            [
-                self.table.make_data([
-                    self.gc.DataTuple('mgid', session_mgid),
-                    self.gc.DataTuple('worker_type', WorkerType.SWITCHML_UDP),
-                    self.gc.DataTuple('worker_id', worker_id),
-                    self.gc.DataTuple('num_workers', num_workers),
-                    self.gc.DataTuple('worker_bitmap', worker_mask)
-                ], 'Ingress.udp_receiver.set_bitmap')
-            ])
+        except:
+            print("Add udp worker fail for worker id:", worker_id)
         return (True, None)
 
     def get_workers_counter(self, worker_id=None):

@@ -14,7 +14,8 @@ control GetPortFromWorkerID(in ingress_metadata_t ig_md, inout ingress_intrinsic
 
     table get_port_from_worker_id{
         key = {
-            ig_md.switchml_md.original_worker_id : exact; // who are we sending to?
+            // match on the lower 16 bits
+            ig_md.switchml_md.original_worker_id : ternary; // who are we sending to?
         }
         actions = {
             set_egress_port();

@@ -43,6 +43,7 @@ class SwitchML(Packet):
         XBitField(      "job_number", 0, 8),
         XIntField(         "tsi", 0),
         XShortField("pool_index", 2),
+        XShortField("udp_port",0),
         XShortField("original_worker_id",0)
     ]
 
@@ -101,7 +102,7 @@ def make_switchml_udp(src_mac, src_ip, dst_mac, dst_ip, src_port, dst_port, pool
     p = (Ether(dst=dst_mac, src=src_mac) /
          IP(dst=dst_ip, src=src_ip)/
          UDP(sport=src_port, dport=dst_port)/
-         SwitchML(pool_index=pool_index,size=1,original_worker_id=worker_id) /
+         SwitchML(udp_port=12345,pool_index=pool_index,size=1,original_worker_id=worker_id) /
          SwitchMLData() /
          SwitchMLData() /
          SwitchMLExponent())  # TODO: move exponents before data once daiet code supports it

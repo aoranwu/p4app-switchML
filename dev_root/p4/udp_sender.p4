@@ -26,6 +26,7 @@ control UDPSender(
     inout header_t hdr) {
 
     DirectCounter<counter_t>(CounterType_t.PACKETS_AND_BYTES) send_counter;
+    Counter<counter_t, pool_index_t>(register_size, CounterType_t.PACKETS) set_udp_counter;
 
     // Read switch MAC and IP from table to form output packets
     action set_switch_mac_and_ip(mac_addr_t switch_mac, ipv4_addr_t switch_ip) {
@@ -131,6 +132,12 @@ control UDPSender(
         dst_addr.apply();
         set_dst_udp_port_tbl.apply();
         
+
+        if(eg_md.use_hier_aggre==0||eg_md.switchml_md.is_root_switch==0){
+            set_udp_counter.count(0);
+            hdr.udp.dst_port = eg_md.switchml_md.original_worker_id[31:16];
+        }
+
         // Add payload size
         if (eg_md.switchml_md.packet_size == packet_size_t.IBV_MTU_256) {
             hdr.ipv4.total_len = hdr.ipv4.total_len + 256;

@@ -1,0 +1,9 @@
+sw1:
+    bfrt_ip: "192.168.1.2"
+    bfrt_port: 50052
+    switch_mac: '06:00:00:00:00:02'
+    switch_ip: '198.19.200.202'
+    ports_file: '/home/aoranwu/p4app-switchML/dev_root/controller/ports_hybrid1.yaml'
+    use_model: 1
+    use_multipipe: 0
+    switch_conf_file: "/home/aoranwu/p4app-switchML/dev_root/controller/sw1_conf_single.yaml"

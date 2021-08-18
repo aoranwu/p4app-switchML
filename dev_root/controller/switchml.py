@@ -45,6 +45,7 @@ from udp_sender import UDPSender
 from set_switch_type import SetSwitchType
 from set_mgid_offset_factor import SetMgidOffsetFactor
 from get_port_from_worker_id import GetPortFromWorkerID
+from set_use_hier_aggre import SetUseHierAggre
 from grpc_server import GRPCServer
 from cli import Cli
 from common import front_panel_regex, mac_address_regex, validate_ip
@@ -142,7 +143,8 @@ class SwitchML(object):
                 list(range(384, 384 + 64, 4)))
             print('Setting {} front panel ports in loopback mode'.format(
                 len(loopback_ports)))
-            self.ports.set_loopback_mode(loopback_ports)
+            loopback_ports = []
+            # self.ports.set_loopback_mode(loopback_ports)
 
             # Enable loopback on PktGen ports
             pktgen_ports = [192, 448]
@@ -184,6 +186,8 @@ class SwitchML(object):
                                                   self.bfrt_info)
             # Worker id and port mapping
             self.get_port_from_worker_id = GetPortFromWorkerID(gc, self.bfrt_info)
+
+            self.set_use_hier_aggre = SetUseHierAggre(gc,self.bfrt_info)
             # Exponents
             self.exponents = Exponents(self.target, gc, self.bfrt_info)
             # Processors
@@ -224,10 +228,12 @@ class SwitchML(object):
                     with open(switch_conf_file) as f:
                         switch_confs = yaml.safe_load(f)
                         switch_conf = switch_confs[switch_name]
+                        self.use_hier_aggre = switch_conf["use_hier_aggre"]
+                        self.set_use_hier_aggre.set_default_entry(self.use_hier_aggre)
                         self.is_root_switch = switch_conf["is_root_switch"]
                         if self.is_root_switch:
                             self.set_switch_type.set_default_entry(1)
-                            self.lower_layer_switches = switch_conf["lower_layer_switches"]
+                            self.lower_layer_switches = switch_conf["lower_layer_switches"] if "lower_layer_switches" in switch_conf.keys() else []
                             for lower_layer_switch in self.lower_layer_switches:
                                 line = " ".join([str(lower_layer_switch['rank']),
                                 str(len(self.lower_layer_switches)),lower_layer_switch['mac_address'],
@@ -258,7 +264,9 @@ class SwitchML(object):
                         for pipe_conf in pipe_confs.values():
                             pipe_num = pipe_conf['pipe_num']
                             mgid_offset_factor = pipe_conf['mgid_offset_factor']
-                            is_root_switch = pipe_conf['is_root_switch']  
+                            is_root_switch = pipe_conf['is_root_switch']
+                            use_hier_aggre  = pipe_conf['use_hier_aggre']
+                            self.set_use_hier_aggre.set_default_entry_for_pipe(use_hier_aggre,pipe_num)  
                             self.cli.do_set_mgid_offset_factor_for_pipe(" ".join([str(mgid_offset_factor),str(pipe_num)]))
                             if is_root_switch:
                                 self.cli.do_set_root_switch_for_pipe(str(pipe_num))
@@ -429,7 +437,7 @@ class SwitchML(object):
 
     def clear_multicast_group(self, session_id):
         ''' Remove multicast group and nodes for this session '''
-
+        session_id = 0
         if session_id in self.multicast_groups:
             for node_id in self.multicast_groups[session_id]:
                 self.pre.remove_multicast_node(node_id)
@@ -490,7 +498,8 @@ class SwitchML(object):
 
         # Multicast groups below 0x8000 are used for sessions
         # (the mgid is the session id)
-        session_id = session_id % 0x8000
+        # session_id = session_id % 0x8000
+        session_id = 0
 
         # Add RDMA receiver/sender entries
         success, error_msg = self.rdma_receiver.add_rdma_worker(
@@ -579,7 +588,8 @@ class SwitchML(object):
 
         # Multicast groups below 0x8000 are used for sessions
         # (the mgid is the session id)
-        session_id = session_id % 0x8000
+        # session_id = session_id % 0x8000
+        session_id = 0
 
         # Add UDP receiver/sender entries
         success, error_msg = self.udp_receiver.add_udp_worker(
@@ -656,7 +666,7 @@ class SwitchML(object):
 
         # Multicast groups below 0x8000 are used for sessions
         # (the mgid is the session id)
-        session_id = session_id % 0x8000
+        session_id = 0
         session_id += pipe
 
         # Add UDP receiver/sender entries
@@ -675,6 +685,8 @@ class SwitchML(object):
 
         # Add multicast group if not present
         if session_id not in self.multicast_groups:
+            print(self.multicast_groups)
+            print(session_id)
             self.pre.add_multicast_group(session_id)
             self.multicast_groups[session_id] = {}
 

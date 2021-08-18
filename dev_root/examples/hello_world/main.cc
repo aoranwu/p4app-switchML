@@ -34,6 +34,7 @@ int main(){
     uint64_t numel = (1 << 15);
     int num_tensors = 8;
     int num_workers = ctx.GetConfig().general_.num_workers;
+    printf("Num of workers: %d\n", num_workers);
     printf("Allocating data\n");
     float in_data[num_tensors][numel];
     float out_data[num_tensors][numel];

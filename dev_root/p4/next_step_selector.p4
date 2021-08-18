@@ -152,6 +152,7 @@ control NextStepSelector(
         // need to set dst addr
         // 0xffff indicates upper level switch
         ig_md.switchml_md.worker_id = 0xffff;
+        ig_md.switchml_md.is_root_switch = 1;
     }
 
     action distribute(){
@@ -221,7 +222,7 @@ control NextStepSelector(
         next_step.apply();
 
         // Update counters
-        if (count_consume || count_drop) {
+        if ( count_drop) {
             drop_counter.count(ig_md.switchml_md.pool_index);
         }
 

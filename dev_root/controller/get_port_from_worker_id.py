@@ -23,7 +23,7 @@ class GetPortFromWorkerID(Table):
         self.get_port_from_worker_id.entry_add(
             self.target,
             [self.get_port_from_worker_id.make_key([gc.KeyTuple('ig_md.switchml_md.original_worker_id',
-                                                                    worker_id)])],
+                                                                    worker_id, 0xffff)])],
             [self.get_port_from_worker_id.make_data([gc.DataTuple('port',port)],
                                                         'Ingress.get_port_from_worker_id.set_egress_port')]
 
@@ -35,7 +35,7 @@ class GetPortFromWorkerID(Table):
         self.get_port_from_worker_id.entry_add(
             self.targets[pipe],
             [self.get_port_from_worker_id.make_key([gc.KeyTuple('ig_md.switchml_md.original_worker_id',
-                                                                    worker_id)])],
+                                                                    worker_id, 0xffff)])],
             [self.get_port_from_worker_id.make_data([gc.DataTuple('port',port)],
                                                         'Ingress.get_port_from_worker_id.set_egress_port')]
 

@@ -77,7 +77,7 @@ header switchml_h {
     bit<32> tsi;
     bit<16> pool_index;
     // worker id for retransmission
-    worker_id_t original_worker_id;
+    bit<32> original_worker_id;
 }
 
 // InfiniBand-RoCE Base Transport Header

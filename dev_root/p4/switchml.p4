@@ -38,6 +38,7 @@
 #include "set_upward_port.p4"
 #include "get_port_from_worker_id.p4"
 #include "set_mgid_offset_factor.p4"
+#include "set_use_hier_aggre.p4"
 
 control Ingress(
     inout header_t hdr,
@@ -65,6 +66,8 @@ control Ingress(
     SetUpwardPort() set_upward_port;
     GetPortFromWorkerID() get_port_from_worker_id;
     SetMgidOffsetFactor() set_mgid_offset_factor;
+
+    SetUseHierAggre() set_use_hier_aggre;
 
     NextStepSelector() next_step_selector;
 
@@ -103,6 +106,7 @@ control Ingress(
     Processor() value30;
     Processor() value31;
 
+    Counter<counter_t, pool_index_t>(register_size, CounterType_t.PACKETS) dist_counter;
     apply {
         // set switch type to be root or non-root
         set_switch.apply(ig_md.switchml_md);
@@ -112,7 +116,7 @@ control Ingress(
 
         if(hdr.switchml.msg_type==msg_type_t.DIST){
 
-
+            dist_counter.count(0);
             // need to modify
             ig_md.switchml_md.packet_size = hdr.switchml.size;
             // ig_md.switchml_md.dst_port = hdr.udp.src_port;
@@ -166,7 +170,7 @@ control Ingress(
             // ig_tm_md.ucast_egress_port = ig_md.switchml_md.ingress_port;
             // ig_tm_md.ucast_egress_port = 1;
             // set up the worker id
-            ig_md.switchml_md.worker_id = ig_md.switchml_md.original_worker_id;
+            ig_md.switchml_md.worker_id = ig_md.switchml_md.original_worker_id[15:0];
 
             get_port_from_worker_id.apply(ig_md,ig_tm_md);
 
@@ -280,8 +284,10 @@ control Egress(
 
     RDMASender() rdma_sender;
     UDPSender() udp_sender;
+    SetUseHierAggre() set_use_hier_aggre;
 
     apply {
+        set_use_hier_aggre.apply(eg_md);
         if (eg_md.switchml_md.packet_type == packet_type_t.BROADCAST ||
             eg_md.switchml_md.packet_type == packet_type_t.RETRANSMIT) {
 

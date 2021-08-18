@@ -76,17 +76,22 @@ class PRE(Control):
             Keyword arguments:
                 mgid -- multicast group ID
         '''
-        self.multicast_group.entry_add(
-            self.target,
-            [self.multicast_group.make_key([self.gc.KeyTuple('$MGID', mgid)])],
-            [
-                self.multicast_group.make_data([
-                    self.gc.DataTuple('$MULTICAST_NODE_ID', int_arr_val=[]),
-                    self.gc.DataTuple('$MULTICAST_NODE_L1_XID_VALID',
-                                      bool_arr_val=[]),
-                    self.gc.DataTuple('$MULTICAST_NODE_L1_XID', int_arr_val=[])
+        try:
+            self.multicast_group.entry_add(
+                self.target,
+                [self.multicast_group.make_key([self.gc.KeyTuple('$MGID', mgid)])],
+                [
+                    self.multicast_group.make_data([
+                        self.gc.DataTuple('$MULTICAST_NODE_ID', int_arr_val=[]),
+                        self.gc.DataTuple('$MULTICAST_NODE_L1_XID_VALID',
+                                        bool_arr_val=[]),
+                        self.gc.DataTuple('$MULTICAST_NODE_L1_XID', int_arr_val=[])
+                    ])
                 ])
-            ])
+        except:
+            print("Add mgid fail for mgid:", mgid)
+
+
     def add_multicast_group_for_pipe(self, mgid, pipe):
         ''' Add an empty multicast group.
 

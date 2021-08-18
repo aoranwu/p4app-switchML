@@ -237,7 +237,7 @@ header switchml_md_h {
     // mgid_offset_factor
     bit<2> unused;
     // store the worker id for multi-switch retransmission
-    worker_id_t original_worker_id;
+    bit<32> original_worker_id;
 
 
     
@@ -278,7 +278,7 @@ struct ingress_metadata_t {
 struct egress_metadata_t {
     switchml_md_h switchml_md;
     switchml_rdma_md_h switchml_rdma_md;
-
+    bit<8> use_hier_aggre;
     // Checksum stuff
     bool checksum_err_ipv4;
     bool update_ipv4_checksum;

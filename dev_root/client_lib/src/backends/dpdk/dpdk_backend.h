@@ -86,7 +86,7 @@ class DpdkBackend : public switchml::Backend {
          * From which worker this packet is sent to the switch
          * Used for hierarchical aggregation when using multiple switches/pipes
         */
-        uint16_t original_worker_id; 
+        uint32_t original_worker_id; 
     }__attribute__((__packed__));
 
     /** A type representing a single element in the packet */

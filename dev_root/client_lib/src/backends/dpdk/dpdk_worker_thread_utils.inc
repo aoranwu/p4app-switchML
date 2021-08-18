@@ -27,7 +27,7 @@
 
 #include <dpdk_backend.h>
 #include <rte_ether.h>
-
+#include <inttypes.h>
 #include "common.h"
 #include "dpdk_utils.h"
 #include "prepostprocessor.h"
@@ -66,7 +66,7 @@ uint16_t PktId2PoolIndex(uint64_t pkt_id, uint32_t switch_pool_index_start,
 __rte_always_inline 
 void BuildPacket(rte_mbuf* mbuf, JobId job_id, uint32_t pkt_id,
                  uint16_t switch_pool_index, uint64_t packet_numel, 
-                 uint16_t original_worker_id,
+                 uint32_t original_worker_id,
                  DpdkBackend::E2eAddress switch_e2e_addr_be,
                  DpdkBackend::E2eAddress worker_thread_e2e_addr_be,
                  std::shared_ptr<PrePostProcessor> ppp) {
@@ -86,6 +86,7 @@ void BuildPacket(rte_mbuf* mbuf, JobId job_id, uint32_t pkt_id,
     // Set MAC addresses
     memcpy(ether->s_addr.addr_bytes, &worker_thread_e2e_addr_be.mac, 6);
     memcpy(ether->d_addr.addr_bytes, &switch_e2e_addr_be.mac, 6);
+    
 
     // Set ethertype
     ether->ether_type = rte_cpu_to_be_16(RTE_ETHER_TYPE_IPV4);
@@ -100,6 +101,7 @@ void BuildPacket(rte_mbuf* mbuf, JobId job_id, uint32_t pkt_id,
     ip->src_addr = worker_thread_e2e_addr_be.ip;
     ip->dst_addr = switch_e2e_addr_be.ip;
 
+    
     // 3. UDP header
     struct rte_udp_hdr *udp = reinterpret_cast<struct rte_udp_hdr*>(ip + 1);
     udp->src_port = worker_thread_e2e_addr_be.port; 
@@ -126,10 +128,20 @@ void BuildPacket(rte_mbuf* mbuf, JobId job_id, uint32_t pkt_id,
     // And in our case, only switch_pool_index and job_type_size will be used by the switch.
     switchml_pkt_hdr->pkt_id = pkt_id;
     switchml_pkt_hdr->switch_pool_index = rte_cpu_to_be_16(switch_pool_index);
-    switchml_pkt_hdr->job_type_size = (1 << 4) + pkt_len_enum; // bit shift for host to network byte order
+    // printf("Switch Pool Index: %d \n", switch_pool_index); 
+    // switchml_pkt_hdr->job_type_size = (1 << 4) + pkt_len_enum; // bit shift for host to network byte order
+    switchml_pkt_hdr->job_type_size = pkt_len_enum; // bit shift for host to network byte order
     switchml_pkt_hdr->short_job_id = job_id; // Select the 8 LSBs of the job id
     switchml_pkt_hdr->original_worker_id = original_worker_id;
+    // printf("BuildPacket worker id:0x%08x\n",original_worker_id);
 
+    
+    switchml_pkt_hdr->original_worker_id |= (((uint32_t)rte_be_to_cpu_16(worker_thread_e2e_addr_be.port))<<16);
+    switchml_pkt_hdr->original_worker_id = rte_cpu_to_be_32(switchml_pkt_hdr->original_worker_id);
+    // printf("BuildPacket original worker id:0x%08x\n",switchml_pkt_hdr->original_worker_id);
+    // printf("BuildPacket udp port:0x%08x\n",(uint32_t)rte_be_to_cpu_16(worker_thread_e2e_addr_be.port));
+    // printf("cpu for 0x12345678 is:0x%08x\n",0x12345678);
+    // printf("be for 0x12345678 is:0x%08x\n",rte_cpu_to_be_32(0x12345678));
     // Preprocess the packet (Copying/quantizing is done here)
     DpdkBackend::DpdkPacketElement* entries_ptr = reinterpret_cast<DpdkBackend::DpdkPacketElement*>(switchml_pkt_hdr+1);
     void* extra_info_ptr = entries_ptr + packet_numel;
@@ -172,7 +184,15 @@ void ReusePacket(rte_mbuf* mbuf, uint32_t pkt_id, uint64_t packet_numel,
     switchml_pkt_hdr->pkt_id = pkt_id;
     // Swap pool index msb to alternate between the pools
     switchml_pkt_hdr->switch_pool_index = rte_cpu_to_be_16(switch_pool_index);
+    switchml_pkt_hdr->job_type_size &= 0xf;
+    switchml_pkt_hdr->original_worker_id = rte_be_to_cpu_32(switchml_pkt_hdr->original_worker_id);
+    switchml_pkt_hdr->original_worker_id &= 0xffff;
+    // switchml_pkt_hdr->original_worker_id |= (((uint32_t)rte_be_to_cpu_16(worker_thread_e2e_addr_be).port))<<16);
+    switchml_pkt_hdr->original_worker_id |= (((uint32_t)rte_be_to_cpu_16(worker_thread_e2e_addr_be.port))<<16);
+    switchml_pkt_hdr->original_worker_id = rte_cpu_to_be_32(switchml_pkt_hdr->original_worker_id);
+    // printf("Reuse original worker id:0x%08x\n",switchml_pkt_hdr->original_worker_id);
 
+    // printf("Reuse Switch Pool Index: %d \n", switch_pool_index); 
     // Preprocess the packet (Copying/quantizing is done here)
     DpdkBackend::DpdkPacketElement* entries_ptr = reinterpret_cast<DpdkBackend::DpdkPacketElement*>(switchml_pkt_hdr+1);
     void* extra_info_ptr = entries_ptr + packet_numel;
@@ -249,6 +269,9 @@ void ResendPacketCallback(struct rte_timer *timer, void *arg) {
     struct rte_mbuf* mbufs[1];
     mbufs[0] = rte_pktmbuf_alloc(args->tx_mempool);
     LOG_IF(FATAL, unlikely(mbufs == NULL)) << "Cannot allocate packet in the ResendPacketCallback";
+
+    //uint32_t udp_port_and_rank = args->dwt->config_.general_.rank;
+    //udp_port_and_rank |= (((uint32_t)args->dwt->worker_thread_e2e_addr_be_.port)<<16);
 
     // Build packet
     BuildPacket(mbufs[0], args->job_id, args->pkt_id, args->switch_pool_index,

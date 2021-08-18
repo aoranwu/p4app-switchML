@@ -145,6 +145,7 @@ class GRPCServer(switchml_pb2_grpc.SessionServicer,
         #Scan bitmap
         idx = -1
         for idx in range(len(self._bcast_bitmap)):
+            print(request.rank)
             if not self._bcast_bitmap[idx][request.rank]:
                 break
 
@@ -305,22 +306,58 @@ class GRPCServer(switchml_pb2_grpc.SessionServicer,
 
         if request.rank == 0:
             # This is the first message, clear out old workers state
-            if not self.ctrl:
+            if self.ctrl and not self.ctrl.is_root_switch:
                 self.ctrl.clear_udp_workers(request.session_id)
             else:
                 for ctrl in self.ctrls.values():
-                    if not ctrl.use_multipipe:
+                    if not ctrl.use_multipipe and not ctrl.is_root_switch:
                         ctrl.clear_udp_workers(request.session_id) 
                     else:
                         self.log.error("clear workers not implemented for multipipe yet")
                                     
 
         # Add new worker
+        try:
+            if self.ctrl:
+                success, error_msg = self.ctrl.add_udp_worker(request.session_id,
+                                                            request.rank,
+                                                            request.num_workers,
+                                                            mac_str, ipv4_str, request.udp_port)
+            else:
+                ctrl = None
+                dev_port = -1
+                for ctrl_ in self.ctrls.values():
+                    success, dev_port_ = ctrl_.forwarder.get_dev_port(mac_str)
+                    if success:
+                        ctrl = ctrl_
+                        dev_port = dev_port_
+                        break
+                if ctrl:
+                    if not ctrl.use_multipipe:
+                        print(f"Add {request.num_workers} workers.....")
+                        success, error_msg = ctrl.add_udp_worker(request.session_id,
+                                                            request.rank,
+                                                            request.num_workers,
+                                                            mac_str, ipv4_str, request.udp_port)
+                    else:
+                        pipe_num = dev_port//128
+                        success, error_msg = ctrl.add_udp_worker_for_pipe(request.session_id,
+                                                            request.rank,
+                                                            request.num_workers//2,
+                                                            mac_str, ipv4_str, request.udp_port, pipe_num)
+        except:
+            print("Add udp worker failed")
+            
+
+        if not success:
+            # self.log.error(error_msg)
+            #TODO return error message
+            return switchml_pb2.UdpSessionResponse(session_id=0, mac=0, ipv4=0)
+        
+
+        # Get switch addresses
         if self.ctrl:
-            success, error_msg = self.ctrl.add_udp_worker(request.session_id,
-                                                        request.rank,
-                                                        request.num_workers,
-                                                        mac_str, ipv4_str, request.udp_port)
+            switch_mac, switch_ipv4 = self.ctrl.get_switch_mac_and_ip()
         else:
             ctrl = None
             dev_port = -1
@@ -330,30 +367,7 @@ class GRPCServer(switchml_pb2_grpc.SessionServicer,
                     ctrl = ctrl_
                     dev_port = dev_port_
                     break
-            if ctrl:
-                if not ctrl.use_multipipe:
-                    success, error_msg = ctrl.add_udp_worker(request.session_id,
-                                                        request.rank,
-                                                        request.num_workers,
-                                                        mac_str, ipv4_str, request.udp_port)
-                else:
-                    pipe_num = dev_port//128
-                    success, error_msg = ctrl.add_udp_worker_for_pipe(request.session_id,
-                                                        request.rank,
-                                                        request.num_workers,
-                                                        mac_str, ipv4_str, request.udp_port, pipe_num)
-
-            
-
-        if not success:
-            self.log.error(error_msg)
-            #TODO return error message
-            return switchml_pb2.UdpSessionResponse(session_id=0, mac=0, ipv4=0)
-
-        # Get switch addresses
-        if self.ctrl:
-            switch_mac, switch_ipv4 = self.ctrl.get_switch_mac_and_ip()
-        else:
+            pipe_num = dev_port//128
             if not ctrl.use_multipipe:
                 switch_mac, switch_ipv4 = ctrl.get_switch_mac_and_ip()
             else:

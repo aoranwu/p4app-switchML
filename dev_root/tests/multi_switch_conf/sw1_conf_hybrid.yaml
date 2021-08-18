@@ -1,0 +1,33 @@
+p0:
+    pipe_num: 0
+    pipe_ip_address: "198.19.200.202"
+    pipe_mac_address: "06:00:00:00:00:02"
+    mgid_offset_factor: 0
+    is_root_switch: 0
+    upward_port: 60
+    upward_switch_mac: "06:00:00:00:00:01"
+    upward_switch_ip: "198.19.200.201"
+    upward_udp_port: 48864
+    use_hier_aggre: 1
+    # workers: [{rank: "0",mac_address: "1c:34:da:42:fe:00",ip_address: "10.0.0.1", udp_port: 4000},
+            #   {rank: "1",mac_address: "1c:34:da:42:fe:60",ip_address: "10.0.0.2", udp_port: 4000}]
+    # workers: [{rank: "0",mac_address: "1c:34:da:42:fe:00",ip_address: "10.0.0.1", udp_port: 4000},
+    #           {rank: "1",mac_address: "1c:34:da:42:fe:60",ip_address: "10.0.0.2", udp_port: 4000}]
+    workers: []
+
+p2:
+    pipe_num: 2
+    pipe_ip_address: "198.19.200.203"
+    pipe_mac_address: "06:00:00:00:00:03"
+    mgid_offset_factor: 2
+    is_root_switch: 0
+    upward_port: 316
+    upward_switch_mac: "06:00:00:00:00:01"
+    upward_switch_ip: "198.19.200.201"
+    upward_udp_port: 48864
+    use_hier_aggre: 1
+    # workers: [{rank: "2",mac_address: "1c:34:da:42:fc:e8",ip_address: "10.0.0.3", udp_port: 4000},
+    #           {rank: "3",mac_address: "ec:0d:9a:c0:41:f4",ip_address: "10.0.0.4", udp_port: 4000}]
+    
+    workers: []
+

@@ -1,0 +1,50 @@
+sw1:
+    bfrt_ip: "10.232.16.200"
+    bfrt_port: 50052
+    switch_mac: '06:00:00:00:00:01'
+    switch_ip: '198.19.200.201'
+    ports_file: '/home/awu/tests/single_switch/ports1.yaml'
+    use_model: 1
+    use_multipipe: 0
+    switch_conf_file: "/home/awu/tests/single_switch/switch_conf.yaml"
+
+    # is_root_switch: 1
+    # lower_layer_switches: [{rank: "0",mac_address: "06:00:00:00:00:02",ip_address: "198.19.200.202", udp_port: 48864},
+    #                        {rank: "1",mac_address: "06:00:00:00:00:03",ip_address: "198.19.200.203", udp_port: 48864}]
+  
+# sw2:
+#     bfrt_ip: "192.168.2.2"
+#     bfrt_port: 50052
+#     switch_mac: '06:00:00:00:00:02'
+#     switch_ip: '198.19.200.202'
+#     ports_file: '/home/aoranwu/p4app-switchML/dev_root/controller/ports2.yaml'
+#     use_model: 1
+#     use_multipipe: 0
+#     switch_conf_file: "/home/aoranwu/p4app-switchML/dev_root/controller/switch_conf.yaml"
+
+#     # is_root_switch: 0
+#     # upward_port: 0
+#     # upward_switch_mac: "06:00:00:00:00:01"
+#     # upward_switch_ip: "198.19.200.201"
+#     # upward_udp_port: 48864
+#     # workers: [{rank: "0",mac_address: "ca:0c:b1:05:46:77",ip_address: "198.19.200.50", udp_port: 12345},
+#     #           {rank: "1",mac_address: "02:ec:cd:ec:30:c2",ip_address: "198.19.200.49", udp_port: 12345}]
+
+# sw3:
+#     bfrt_ip: "192.168.3.2"
+#     bfrt_port: 50052
+#     switch_mac: '06:00:00:00:00:03'
+#     switch_ip: '198.19.200.203'
+#     ports_file: '/home/aoranwu/p4app-switchML/dev_root/controller/ports3.yaml'
+#     use_model: 1
+#     use_multipipe: 0
+#     switch_conf_file: "/home/aoranwu/p4app-switchML/dev_root/controller/switch_conf.yaml"
+
+#     # is_root_switch: 0
+#     # upward_port: 0
+#     # upward_switch_mac: "06:00:00:00:00:01"
+#     # upward_switch_ip: "198.19.200.201"
+#     # upward_udp_port: 48864
+#     # workers: [{rank: "0",mac_address: "e6:5d:09:2e:a3:ac",ip_address: "198.19.200.48", udp_port: 12345},
+#     #           {rank: "1",mac_address: "9e:3e:ed:c0:b6:5c",ip_address: "198.19.200.47", udp_port: 12345}]
+

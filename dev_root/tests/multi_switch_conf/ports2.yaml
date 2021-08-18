@@ -1,0 +1,3 @@
+ports:
+    16/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "06:00:00:00:00:02"}
+    17/0 : {speed: "100G", fec: "none", autoneg: "disable", mac: "06:00:00:00:00:03"}

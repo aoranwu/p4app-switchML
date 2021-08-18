@@ -1,0 +1,5 @@
+sw2:
+    is_root_switch: 1
+    lower_layer_switches: [{rank: "4",mac_address: "06:00:00:00:00:02",ip_address: "198.19.200.202", udp_port: 48864},
+                           {rank: "5",mac_address: "06:00:00:00:00:03",ip_address: "198.19.200.203", udp_port: 48864}]
+    use_hier_aggre: 1
